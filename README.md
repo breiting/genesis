@@ -39,7 +39,7 @@ Core concepts:
 
 ### Example: XOR Evolution
 
-Genesis ships with a simple example where NeuroEvolution learns the XOR logical function.
+**genesis** ships with a simple example where NeuroEvolution learns the XOR logical function.
 
 ```cpp
 gr::NeuralNetwork nn({2, 4, 1});
@@ -68,7 +68,7 @@ Over generations, the population converges toward a network that correctly compu
 
 ## Future Directions
 
-Genesis is built to serve as a foundation for:
+**genesis** is built to serve as a foundation for:
 
 - 🧭 Autonomous agent environments — maze navigation, obstacle avoidance, swarm behavior.
 - 🔄 Dynamic topologies — adding/removing neurons or connections during evolution (NEAT-style).
@@ -113,7 +113,7 @@ If you use **genesis** in research, please cite it as:
 ```
 @software{genesis2025,
   author = {Bernhard Reitinger},
-  title = {genesis: A Lightweight C++17 Framework for NeuroEvolution},
+  title = {genesis: A Lightweight C++ Framework for NeuroEvolution},
   year = {2025},
   license = {MIT},
   url = {https://github.com/breiting/genesis}
@@ -122,13 +122,16 @@ If you use **genesis** in research, please cite it as:
 
 ## Author
 
-Genesis is created and maintained by Bernhard Reitinger (@breiting).
+**genesis** is created and maintained by Bernhard Reitinger (@breiting).
 Contributions, discussions, and pull requests are welcome!
 
 ## 🙏 Credits
 
-- [Dear ImGui](https://github.com/ocornut/imgui)
-- [GLFW](https://github.com/glfw/glfw)
-- [stb_image](https://github.com/nothings/stb)
+**genesis** uses the following libraries and resources.
+
 - [GLM](https://github.com/g-truc/glm)
+- [GLFW](https://github.com/glfw/glfw)
+- [ImGui](https://github.com/ocornut/imgui)
+- [oneTBB](https://github.com/uxlfoundation/oneTBB)
+- [stb_image](https://github.com/nothings/stb)
 - [Roboto](https://fonts.google.com/specimen/Roboto) font ([Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0))
