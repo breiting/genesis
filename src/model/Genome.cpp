@@ -1,7 +1,7 @@
 #include <cassert>
 #include <fstream>
 #include <genesis/core/Math.hpp>
-#include <genesis/model/evolution/Genome.hpp>
+#include <genesis/model/Genome.hpp>
 
 namespace gen {
 

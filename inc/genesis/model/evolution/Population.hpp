@@ -1,38 +1,36 @@
 #pragma once
+#include <genesis/model/agent/Agent.hpp>
 #include <vector>
-
-#include "Genome.hpp"
 
 namespace gen {
 
 /**
- * @brief Represents a population of genomes that evolve over generations.
- *
- * Each generation:
- *  1. Sort by fitness (descending)
- *  2. Copy top N% as elites
- *  3. Fill rest by crossover + mutation
- *
- * The Population itself does not evaluate fitness — that is handled externally.
+ * @brief A population of agents evolving over time.
  */
 class Population {
    public:
-    Population(size_t size, size_t geneCount);
+    Population(size_t size, const std::vector<int>& brainLayout);
 
-    // --- Access ---
-    std::vector<Genome>& GetGenomes();
-    const Genome& GetBest() const;
+    /// Reset all agents with random brains.
+    void Initialize();
 
-    // --- Evolution steps ---
-    void SortByFitness();
+    /// Run one simulation epoch
+    void Simulate(float dt, size_t steps);
+
+    /// Apply simple evolutionary step (sort + mutate).
     void Evolve(float mutationRate, float mutationMag, float elitism = 0.1f);
-    float GetAverageFitness() const;
 
-    size_t Size() const {
-        return m_Genomes.size();
+    /// @return All agents.
+    std::vector<std::unique_ptr<Agent>>& GetAgents() {
+        return m_Agents;
     }
 
+    /// @return Best agent by fitness.
+    const Agent& GetBest() const;
+
    private:
-    std::vector<Genome> m_Genomes;
+    std::vector<std::unique_ptr<Agent>> m_Agents;
+    std::vector<int> m_BrainLayout;
 };
+
 }  // namespace gen

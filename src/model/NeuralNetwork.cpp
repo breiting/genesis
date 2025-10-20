@@ -2,7 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include <genesis/core/Math.hpp>
-#include <genesis/model/evolution/NeuralNetwork.hpp>
+#include <genesis/model/NeuralNetwork.hpp>
 #include <stdexcept>
 
 namespace gen {

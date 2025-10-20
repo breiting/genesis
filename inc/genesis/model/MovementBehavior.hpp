@@ -1,5 +1,5 @@
 #pragma once
-#include <genesis/model/agent/IBehavior.hpp>
+#include <genesis/model/IBehavior.hpp>
 #include <glm/glm.hpp>
 
 namespace gen {
@@ -11,7 +11,7 @@ class MovementBehavior : public IBehavior {
    public:
     explicit MovementBehavior(glm::vec2 goal);
 
-    void Execute(Agent& agent, float dt) override;
+    void Execute(const std::string& capability, Agent& agent, float dt) override;
 
    private:
     glm::vec2 m_Goal;

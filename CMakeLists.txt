@@ -72,6 +72,15 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(TBB)
 
+# ----------------------------------------------------------
+# Google Test
+# ----------------------------------------------------------
+FetchContent_Declare(
+		googletest
+		URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+		DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_MakeAvailable(googletest)
 
 # ----------------------------------------------------------
 # Start with BUILD DEFINITION
@@ -120,15 +129,14 @@ add_library(genesis
 	src/core/Time.cpp
 	src/core/Logger.cpp
 
-	src/model/agent/Agent.cpp
-	src/model/agent/Entity.cpp
-	src/model/agent/MovementBehavior.cpp
-
-	src/model/environment/PathEnvironment.cpp
-
-	src/model/evolution/Genome.cpp
-	src/model/evolution/NeuralNetwork.cpp
-	src/model/evolution/Population.cpp
+	src/model/Agent.cpp
+	src/model/Capability.cpp
+	src/model/Genome.cpp
+	src/model/MovementBehavior.cpp
+	src/model/NeuralNetwork.cpp
+# src/model/agent/MovementBehavior.cpp
+# src/model/environment/PathEnvironment.cpp
+# src/model/evolution/Population.cpp
 )
 
 
@@ -166,3 +174,7 @@ target_include_directories(evolution
 		${CMAKE_SOURCE_DIR}/inc ${CMAKE_SOURCE_DIR}/extern/glad/include)
 
 target_compile_features(evolution PRIVATE cxx_std_17)
+
+# TESTING
+enable_testing()
+add_subdirectory(tests)

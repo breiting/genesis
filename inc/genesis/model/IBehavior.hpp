@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 namespace gen {
 
 class Agent;
@@ -12,7 +13,7 @@ class IBehavior {
     virtual ~IBehavior() = default;
 
     /// Execute behavior logic for one time step.
-    virtual void Execute(Agent& agent, float dt) = 0;
+    virtual void Execute(const std::string& capability, Agent& agent, float dt) = 0;
 };
 
 }  // namespace gen
