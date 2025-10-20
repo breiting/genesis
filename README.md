@@ -28,6 +28,29 @@ During evolution:
 
 This approach is powerful for non-differentiable, discontinuous, or sparse-reward problems — such as navigation, control, or decision-making agents — where gradient descent fails.
 
+
+## 🧭 Understanding the Search Space in NeuroEvolution
+
+In NeuroEvolution, the search space represents the set of all possible neural network configurations — every conceivable combination of weights, biases, and potentially other structural or behavioral parameters that define an agent’s behavior.
+
+Each genome in **genesis** encodes a single point in this multidimensional space. The Population forms a cloud of such points, exploring different regions through genetic operators like mutation and crossover. The fitness function then defines a landscape over this space — a surface where higher elevations correspond to better-performing individuals.
+
+Rather than following gradients (as in back-propagation), NeuroEvolution performs a stochastic search across this landscape. It does not require differentiability, making it especially powerful for non-linear, discontinuous, or simulation-based problems where no analytical gradient exists.
+
+Formally:
+
+$\Omega = \{ \theta \in \mathbb{R}^n \mid \theta \text{ represents all evolvable parameters of the agent} \}$
+
+In practice, this means that anything you can represent as a vector of numbers can be evolved:
+
+- Neural weights and biases
+- Activation parameters
+- Network topology and connectivity
+- Control variables or sensor mappings
+- Even physical properties in a simulated agent (e.g., morphology, sensors, or motor strengths)
+
+In **genesis**, the `Genome` defines the coordinates of a solution in this vast search space, the `Population` evolves its distribution over time, and the `Evaluator` shapes the landscape by assigning fitness. Together, these components turn **genesis** into a search engine for emergent intelligence — capable of discovering complex behaviors without explicit instruction or gradients.
+
 ## Project Architecture
 
 Core concepts:

@@ -11,9 +11,9 @@ using namespace std;
 
 constexpr size_t populationSize = 50;
 constexpr int generations = 100;
+const std::vector<int> layout = {2, 4, 1};
 
 void test(const Genome& best) {
-    std::vector<int> layout = {2, 4, 1};
     auto nn = std::make_shared<NeuralNetwork>(layout);
     nn->SetWeightsAndBiases(best.GetDNA());
 
@@ -30,13 +30,12 @@ void test(const Genome& best) {
         int predicted = (out[0] > 0.5f) ? 1 : 0;
         if (predicted == static_cast<int>(targets[i])) correct++;
         std::cout << inputs[i][0] << " XOR " << inputs[i][1] << " => " << predicted << " (target=" << targets[i]
-                  << ")\n";
+                  << ") - val: " << out[0] << std::endl;
     }
     std::cout << "Accuracy: " << (100.0f * correct / inputs.size()) << "%\n";
 }
 
 int main() {
-    std::vector<int> layout = {2, 4, 1};
     auto nn = std::make_shared<NeuralNetwork>(layout);
     size_t geneCount = nn->GetWeightsAndBiases().size();
 
@@ -60,7 +59,8 @@ int main() {
         // Evolve to next generation
         population.Evolve(0.1f, 0.3f, 0.1f);
 
-        std::cout << "Generation " << generation << " | Best Fitness: " << bestFitness << std::endl;
+        std::cout << "Generation " << generation << " | Avg Fitness: " << population.GetAverageFitness()
+                  << " | Best Fitness: " << bestFitness << std::endl;
 
         if (bestFitness > 0.99f) {
             std::cout << "✅ XOR solved at generation " << generation << "!\n";
