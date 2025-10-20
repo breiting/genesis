@@ -1,10 +1,10 @@
 # 🧬 genesis
 
-_A Lightweight C++17 NeuroEvolution Framework for Intelligent Agents_
+_A Lightweight C++ NeuroEvolution Framework for Intelligent Agents_
 
 ## Overview
 
-**genesis** is a modular, C++17 framework designed for building and evolving artificial neural agents using NeuroEvolution — the combination of neural networks and genetic algorithms.
+**genesis** is a modular, C++ framework designed for building and evolving artificial neural agents using NeuroEvolution — the combination of neural networks and genetic algorithms.
 
 The goal of **genesis** is to provide a clear, efficient, and extensible architecture for experimentation with autonomous agents that learn through evolution rather than gradient-based training.
 
