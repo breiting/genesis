@@ -120,8 +120,14 @@ add_library(genesis
 	src/core/Time.cpp
 	src/core/Logger.cpp
 
-	src/model/evolution/NeuralNetwork.cpp
+	src/model/agent/Agent.cpp
+	src/model/agent/Entity.cpp
+	src/model/agent/MovementBehavior.cpp
+
+	src/model/environment/PathEnvironment.cpp
+
 	src/model/evolution/Genome.cpp
+	src/model/evolution/NeuralNetwork.cpp
 	src/model/evolution/Population.cpp
 )
 

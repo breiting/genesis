@@ -1,79 +1,41 @@
 #include <genesis/core/Math.hpp>
+#include <genesis/model/agent/MovementBehavior.hpp>
+#include <genesis/model/environment/PathEnvironment.hpp>
 #include <genesis/model/evolution/Genome.hpp>
 #include <genesis/model/evolution/NeuralNetwork.hpp>
+#include <genesis/model/evolution/PathEvaluator.hpp>
 #include <genesis/model/evolution/Population.hpp>
 #include <genesis/model/evolution/XorEvaluator.hpp>
 #include <iostream>
-#include <memory>
 
 using namespace gen;
 using namespace std;
 
-constexpr size_t populationSize = 50;
-constexpr int generations = 100;
-const std::vector<int> layout = {2, 4, 1};
-
-void test(const Genome& best) {
-    auto nn = std::make_shared<NeuralNetwork>(layout);
-    nn->SetWeightsAndBiases(best.GetDNA());
-
-    nn->ExportDot("nn.dot");
-
-    std::cout << "\nTesting best genome:\n";
-
-    std::vector<std::vector<float>> inputs = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
-    std::vector<float> targets = {0, 1, 1, 0};
-
-    int correct = 0;
-    for (size_t i = 0; i < inputs.size(); ++i) {
-        auto out = nn->Forward(inputs[i]);
-        int predicted = (out[0] > 0.5f) ? 1 : 0;
-        if (predicted == static_cast<int>(targets[i])) correct++;
-        std::cout << inputs[i][0] << " XOR " << inputs[i][1] << " => " << predicted << " (target=" << targets[i]
-                  << ") - val: " << out[0] << std::endl;
-    }
-    std::cout << "Accuracy: " << (100.0f * correct / inputs.size()) << "%\n";
-}
-
 int main() {
-    auto nn = std::make_shared<NeuralNetwork>(layout);
-    size_t geneCount = nn->GetWeightsAndBiases().size();
+    auto nn = std::make_shared<NeuralNetwork>(std::vector<int>{4, 8, 2});
+    size_t weightCount = nn->GetWeightsAndBiases().size();
 
-    // Create population
-    Population population(populationSize, geneCount);
+    // Nur 1 Agent / 1 Genome
+    Population pop(1, weightCount);
+    PathEnvironment env(1);
+    PathEvaluator eval(nn, env);
 
-    // Create XOR fitness evaluator
-    XorEvaluator evaluator(nn);
+    const size_t generations = 5;
 
-    // Evolution loop
-    for (int generation = 0; generation < generations; ++generation) {
-        float bestFitness = 0.0f;
+    for (size_t gen = 0; gen < generations; ++gen) {
+        auto& genome = pop.GetGenomes()[0];
+        float fitness = eval.Evaluate(genome);
+        genome.SetFitness(fitness);
 
-        // Evaluate all genomes
-        for (auto& genome : population.GetGenomes()) {
-            float fitness = evaluator.Evaluate(genome);
-            genome.SetFitness(fitness);
-            if (fitness > bestFitness) bestFitness = fitness;
-        }
+        std::cout << "Generation " << gen << " | Fitness: " << fitness << std::endl;
 
-        // Evolve to next generation
-        population.Evolve(0.1f, 0.3f, 0.1f);
-
-        std::cout << "Generation " << generation << " | Avg Fitness: " << population.GetAverageFitness()
-                  << " | Best Fitness: " << bestFitness << std::endl;
-
-        if (bestFitness > 0.99f) {
-            std::cout << "✅ XOR solved at generation " << generation << "!\n";
-            break;
-        }
+        // nur minimale Mutation
+        genome.Mutate(0.5f, 0.1f);
     }
 
-    // Save the best genome
-    const Genome& best = population.GetBest();
-    best.SaveBinary("best_xor_genome.bin");
-    std::cout << "Best genome saved.\n";
-
-    test(best);
+    const auto& best = pop.GetBest();
+    std::cout << "Best fitness: " << best.GetFitness() << std::endl;
+    best.SaveBinary("best_single_agent.genome");
 
     return 0;
 }
