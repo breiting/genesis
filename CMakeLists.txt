@@ -119,9 +119,10 @@ include_directories(${CMAKE_SOURCE_DIR}/inc)
 add_library(genesis
 	src/core/Time.cpp
 	src/core/Logger.cpp
-	src/model/NeuralNetwork.cpp
-	src/model/Genome.cpp
-	src/model/Population.cpp
+
+	src/model/evolution/NeuralNetwork.cpp
+	src/model/evolution/Genome.cpp
+	src/model/evolution/Population.cpp
 )
 
 
