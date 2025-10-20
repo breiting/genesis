@@ -9,7 +9,14 @@ const std::string& Agent::GetId() const {
     return m_Id;
 }
 
-void Agent::Update(float /*dt*/) {
+void Agent::Update(float dt) {
+    if (m_Embodiment) {
+        m_Embodiment->Update(dt);
+    }
+
+    for (auto& [name, cap] : m_Capabilities) {
+        cap->Execute(*this, dt);
+    }
 }
 
 void Agent::SetEmbodiment(std::unique_ptr<IEmbodiment> emb) {

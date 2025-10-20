@@ -28,7 +28,6 @@ void MovementBehavior::Execute(const std::string& capability, Agent& agent, floa
     if (glm::length(vel) > maxSpeed) vel = glm::normalize(vel) * maxSpeed;
 
     emb->SetVelocity(vel);
-    emb->Update(dt);
 }
 
 }  // namespace gen

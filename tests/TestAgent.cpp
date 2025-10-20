@@ -14,13 +14,16 @@ TEST(TestAgent, Create) {
 
 TEST(TestAgent, Embodiment) {
     Agent agent("007");
-    auto embodiment = std::make_unique<SimpleEmbodiment>(glm::vec2(5.0, 5.0));
+    auto embodiment = std::make_unique<SimpleEmbodiment>(glm::vec2(5.0, 6.0));
     agent.SetEmbodiment(std::move(embodiment));
 
     auto ptr = agent.GetEmbodiment();
 
     ASSERT_NE(ptr, nullptr);
     EXPECT_FLOAT_EQ(ptr->GetPosition().x, 5.0);
+    EXPECT_FLOAT_EQ(ptr->GetPosition().y, 6.0);
+    EXPECT_FLOAT_EQ(ptr->GetVelocity().x, 0.0);
+    EXPECT_FLOAT_EQ(ptr->GetVelocity().y, 0.0);
 }
 
 TEST(TestAgent, Capability) {
