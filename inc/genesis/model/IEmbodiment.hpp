@@ -11,6 +11,8 @@ class IEmbodiment {
    public:
     virtual ~IEmbodiment() = default;
 
+    virtual glm::vec2 GetStartPosition() const = 0;
+
     virtual glm::vec2 GetPosition() const = 0;
     virtual void SetPosition(const glm::vec2& pos) = 0;
 

@@ -1,7 +1,6 @@
-#include <algorithm>
 #include <cassert>
 #include <genesis/core/Math.hpp>
-#include <genesis/model/evolution/Population.hpp>
+#include <genesis/model/Population.hpp>
 
 namespace gen {
 

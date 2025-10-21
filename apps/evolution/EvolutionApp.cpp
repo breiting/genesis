@@ -12,7 +12,7 @@
 #include <iostream>
 #include <memory>
 
-#include "genesis/core/Math.hpp"
+#include "genesis/model/MovementEvaluator.hpp"
 
 using namespace gen;
 using namespace std;
@@ -37,11 +37,21 @@ void EvolutionApp::CreateAgent(const glm::vec2& pos, const glm::vec2& target) {
 bool EvolutionApp::Init(gen::AppContext& ctx) {
     std::cout << "Initializing EvolutionApp..." << std::endl;
 
+    m_StartPos = glm::vec2(-50.0f, 0.0f);
+    m_TargetPos = glm::vec2(0.0f, 0.0f);
+
+    // Generate population
+    for (int i = 0; i < m_NumAgents; i++) {
+        CreateAgent(m_StartPos, m_TargetPos);
+    }
+
     auto height = 100;
 
     m_Camera.SetOrthoByHeight(height, ctx.Aspect());
 
     m_AgentView.Init();
+    m_StartView.Init();
+    m_TargetView.Init();
 
     m_Gui = std::make_unique<ImGuiLayer>(ctx.GetWindow().GetNativeWindow());
 
@@ -85,11 +95,20 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
 }
 
 void EvolutionApp::Update(gen::AppContext& /*ctx*/, double dt) {
-    for (auto& a : m_Agents) {
-        a->Update(dt);
+    if (m_IsObserving) {
+        for (auto& a : m_Agents) {
+            a->Update(dt);
+        }
+        m_AgentView.UpdateInstances(m_Agents);
     }
-    m_AgentView.UpdateInstances(m_Agents);
     m_Camera.Update(dt);
+}
+
+void EvolutionApp::RepositionAgents() {
+    for (int i = 0; i < m_NumAgents; i++) {
+        m_Agents[i]->GetEmbodiment()->SetPosition(m_StartPos);
+        m_Agents[i]->GetEmbodiment()->SetVelocity(glm::vec2(0.0f));
+    }
 }
 
 void EvolutionApp::Render(gen::AppContext& ctx) {
@@ -98,6 +117,8 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
         return;
     }
 
+    m_StartView.Draw(m_StartPos, 5.0f, glm::vec4(1.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
+    m_TargetView.Draw(m_TargetPos, 2.0f, glm::vec4(0.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
     m_AgentView.Draw(m_Camera.ViewProj());
 
     m_Gui->BeginFrame();
@@ -105,14 +126,32 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
     ImGui::Begin("Evolution Stats");
     ImGui::Separator();
     ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
-    ImGui::SliderInt("Agents", &m_NumAgents, 10, 100);
-    if (ImGui::Button("Generate")) {
-        m_Agents.clear();
-        for (int i = 0; i < m_NumAgents; i++) {
-            auto pos = RandUnitVec2();
-            pos *= 50;
-            CreateAgent(pos, {0, 0});
+    ImGui::SliderInt("Agents", &m_NumAgents, 10, 200);
+    if (ImGui::Button("Observe")) {
+        RepositionAgents();
+        m_IsObserving = true;
+    }
+    if (ImGui::Button("Train")) {
+        m_IsObserving = false;
+
+        if (!m_Trainer) {
+            auto eval = std::make_unique<MovementEvaluator>(m_TargetPos);
+            m_Trainer = std::make_unique<Trainer>(m_Agents, std::move(eval), "movement");
         }
+
+        constexpr float dt = 0.1f;  // 1/60
+        constexpr int steps = 500;
+        constexpr float mutationRate = 0.1;
+        constexpr float mutationMag = 0.05;
+        constexpr float elitism = 0.1;
+        RepositionAgents();
+        m_Trainer->RunGeneration(dt, steps, mutationRate, mutationMag, elitism);
+        m_AgentView.UpdateInstances(m_Agents);
+    }
+
+    if (m_Trainer) {
+        ImGui::Text("Best Fitness: %.3f", m_Trainer->GetBestFitness());
+        ImGui::Text("Avg Fitness:  %.3f", m_Trainer->GetAverageFitness());
     }
     ImGui::End();
 

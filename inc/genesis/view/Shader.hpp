@@ -21,6 +21,7 @@ class Shader {
 
     // Load and build a pre-defined shader
     void BuildAgent();
+    void BuildTarget();
 
     // Set data to shader
     void SetMat3(const std::string& name, const glm::mat3& m) const;

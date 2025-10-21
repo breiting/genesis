@@ -37,4 +37,12 @@ Capability* Agent::GetCapability(const std::string& name) {
     return it != m_Capabilities.end() ? it->second.get() : nullptr;
 }
 
+void Agent::SetFitness(float f) {
+    m_Fitness = f;
+}
+
+float Agent::GetFitness() const {
+    return m_Fitness;
+}
+
 }  // namespace gen

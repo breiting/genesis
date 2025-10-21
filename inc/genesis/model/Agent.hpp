@@ -27,10 +27,15 @@ class Agent {
     /// Get Id
     const std::string& GetId() const;
 
+    /// Fitness
+    void SetFitness(float f);
+    float GetFitness() const;
+
    private:
     std::string m_Id;
     std::unique_ptr<IEmbodiment> m_Embodiment;
     std::unordered_map<std::string, std::unique_ptr<Capability>> m_Capabilities;
+    float m_Fitness{0.0f};
 };
 
 }  // namespace gen

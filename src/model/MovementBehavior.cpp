@@ -24,7 +24,7 @@ void MovementBehavior::Execute(const std::string& capability, Agent& agent, floa
 
     glm::vec2 accel(output[0], output[1]);
     glm::vec2 vel = emb->GetVelocity() + accel * dt;
-    float maxSpeed = 10.0f;
+    float maxSpeed = 2.0f;
     if (glm::length(vel) > maxSpeed) vel = glm::normalize(vel) * maxSpeed;
 
     emb->SetVelocity(vel);

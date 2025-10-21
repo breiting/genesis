@@ -133,9 +133,12 @@ add_library(genesis
 
 	src/model/Agent.cpp
 	src/model/Capability.cpp
+	src/model/FitnessTracker.cpp
 	src/model/Genome.cpp
 	src/model/MovementBehavior.cpp
+	src/model/MovementEvaluator.cpp
 	src/model/NeuralNetwork.cpp
+	src/model/Trainer.cpp
 # src/model/agent/MovementBehavior.cpp
 # src/model/environment/PathEnvironment.cpp
 # src/model/evolution/Population.cpp
@@ -143,6 +146,7 @@ add_library(genesis
 	src/view/AgentView.cpp
 	src/view/Camera2D.cpp
 	src/view/Shader.cpp
+	src/view/TargetView.cpp
 )
 
 
@@ -154,6 +158,9 @@ set(GEN_INC_DIR    "${CMAKE_BINARY_DIR}/generated")
 
 embed_text_to_header("${SHADER_SRC_DIR}/agent.vert"  "${GEN_INC_DIR}/assets/agent_vert.h"  agent_vert_glsl)
 embed_text_to_header("${SHADER_SRC_DIR}/agent.frag"  "${GEN_INC_DIR}/assets/agent_frag.h"  agent_frag_glsl)
+
+embed_text_to_header("${SHADER_SRC_DIR}/target.vert"  "${GEN_INC_DIR}/assets/target_vert.h"  target_vert_glsl)
+embed_text_to_header("${SHADER_SRC_DIR}/target.frag"  "${GEN_INC_DIR}/assets/target_frag.h"  target_frag_glsl)
 
 target_link_libraries(genesis
 PUBLIC

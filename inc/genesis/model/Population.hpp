@@ -1,5 +1,5 @@
 #pragma once
-#include <genesis/model/agent/Agent.hpp>
+#include <genesis/model/Agent.hpp>
 #include <vector>
 
 namespace gen {

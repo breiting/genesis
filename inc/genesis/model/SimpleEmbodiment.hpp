@@ -8,7 +8,11 @@ namespace gen {
  */
 class SimpleEmbodiment : public IEmbodiment {
    public:
-    explicit SimpleEmbodiment(glm::vec2 pos = {0, 0}) : m_Pos(pos) {
+    explicit SimpleEmbodiment(glm::vec2 pos = {0, 0}) : m_StartPos(pos), m_Pos(pos) {
+    }
+
+    glm::vec2 GetStartPosition() const override {
+        return m_StartPos;
     }
 
     glm::vec2 GetPosition() const override {
@@ -38,6 +42,7 @@ class SimpleEmbodiment : public IEmbodiment {
     }
 
    private:
+    glm::vec2 m_StartPos;
     glm::vec2 m_Pos;
     glm::vec2 m_Vel{0, 0};
     float m_Radius = 1.0f;

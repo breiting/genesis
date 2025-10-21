@@ -1,4 +1,4 @@
-#include <genesis/model/evolution/FitnessTracker.hpp>
+#include <genesis/model/FitnessTracker.hpp>
 #include <numeric>
 
 namespace gen {

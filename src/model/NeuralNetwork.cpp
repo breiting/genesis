@@ -14,8 +14,8 @@ NeuralNetwork::NeuralNetwork(const std::vector<int>& layout) : m_Layers(layout) 
     m_Biases.resize(GetBiasCount());
 
     // Default: all hidden layers = ReLU, Output = Sigmoid
-    m_Activations.resize(layout.size() - 1, ActivationType::ReLU);
-    m_Activations.back() = ActivationType::Sigmoid;
+    m_Activations.resize(layout.size() - 1, ActivationType::Tanh);
+    m_Activations.back() = ActivationType::Tanh;
 
     Randomize();
 }

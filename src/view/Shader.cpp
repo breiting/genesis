@@ -4,6 +4,8 @@
 
 #include "assets/agent_frag.h"
 #include "assets/agent_vert.h"
+#include "assets/target_frag.h"
+#include "assets/target_vert.h"
 
 namespace gen {
 
@@ -97,4 +99,9 @@ unsigned int Shader::GetInt(const std::string& name) const {
 void Shader::BuildAgent() {
     CompileShader(agent_vert_glsl, agent_frag_glsl);
 }
+
+void Shader::BuildTarget() {
+    CompileShader(target_vert_glsl, target_frag_glsl);
+}
+
 }  // namespace gen

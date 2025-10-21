@@ -2,9 +2,13 @@
 
 #include <genesis/core/IApp.hpp>
 #include <genesis/model/Agent.hpp>
+#include <genesis/model/Trainer.hpp>
 #include <genesis/ui/IGuiLayer.hpp>
 #include <genesis/view/AgentView.hpp>
 #include <genesis/view/Camera2D.hpp>
+#include <memory>
+
+#include "genesis/view/TargetView.hpp"
 
 /**
  * @brief Standalone demo app showcasing evolution
@@ -20,6 +24,7 @@ class EvolutionApp : public gen::IApp {
 
    private:
     void CreateAgent(const glm::vec2& pos, const glm::vec2& target);
+    void RepositionAgents();
 
    private:
     gen::Camera2D m_Camera;
@@ -32,11 +37,20 @@ class EvolutionApp : public gen::IApp {
     bool m_IsDragging = false;
 
     float m_Timescale = 1.0f;
-    int m_NumAgents = 20;
+    int m_NumAgents = 100;
+
+    glm::vec2 m_StartPos;
+    glm::vec2 m_TargetPos;
+
+    bool m_IsObserving = false;
 
     std::vector<std::unique_ptr<gen::Agent>> m_Agents;
+    std::unique_ptr<gen::Trainer> m_Trainer;
 
+    // Views
     gen::AgentView m_AgentView;
+    gen::TargetView m_StartView;
+    gen::TargetView m_TargetView;
 
     bool m_Quit{false};
 };
