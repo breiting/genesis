@@ -82,9 +82,19 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
         m_MousePos = pos;
     };
 
-    onMouseButton = [this](int button, int action, int /*mod*/) {
+    onMouseButton = [this, &ctx](int button, int action, int /*mod*/) {
         if (button == GLFW_MOUSE_BUTTON_1) {
             if (action == GLFW_PRESS) {
+                if (m_SetStartPos) {
+                    m_StartPos = m_Camera.ScreenToWorld(m_MousePos, ctx.GetWidth(), ctx.GetHeight());
+
+                    m_Agents.clear();
+                    for (int i = 0; i < m_NumAgents; i++) {
+                        CreateAgent(m_StartPos, m_TargetPos);
+                    }
+
+                    m_SetStartPos = false;
+                }
                 m_DragStart = m_MousePos;
                 m_IsDragging = true;
             } else if (action == GLFW_RELEASE) {
@@ -132,7 +142,7 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
         return;
     }
 
-    m_StartView.Draw(m_StartPos, 5.0f, glm::vec4(1.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
+    m_StartView.Draw(m_StartPos, 2.0f, glm::vec4(1.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
     m_TargetView.Draw(m_TargetPos, 2.0f, glm::vec4(0.0, 1.0, 1.0, 1.0), m_Camera.ViewProj());
     m_AgentView.Draw(m_Camera.ViewProj());
 
@@ -142,12 +152,21 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
     ImGui::Separator();
     ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
     ImGui::SliderInt("Agents", &m_NumAgents, 10, 200);
+    if (ImGui::Button("Set Start Pos")) {
+        m_SetStartPos = true;
+    }
+    if (ImGui::Button("LOAD Genome")) {
+        m_BestGenome.LoadBinary("best.dna");
+    }
+    if (ImGui::Button("SAVE Genome")) {
+        m_BestGenome = m_Agents[0]->GetCapability("movement")->GetGenome();
+        m_BestGenome.SaveBinary("best.dna");
+    }
     if (ImGui::Button("Apply")) {
-        auto bestDNA = m_Agents[0]->GetCapability("movement")->GetBrain().GetWeightsAndBiases();
         for (auto& a : m_Agents) {
             auto* cap = a->GetCapability("movement");
             if (!cap) continue;
-            cap->GetBrain().SetWeightsAndBiases(bestDNA);
+            cap->SetFromGenome(m_BestGenome);
         }
 
         RepositionAgents(true);

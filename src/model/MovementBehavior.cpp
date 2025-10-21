@@ -17,6 +17,10 @@ void MovementBehavior::Execute(const std::string& capability, Agent& agent, floa
 
     glm::vec2 toGoal = m_Goal - emb->GetPosition();
     float dist = glm::length(toGoal);
+    if (dist < 0.5) {
+        // stop
+        emb->SetVelocity(glm::vec2(0));
+    }
     glm::vec2 dir = dist > 0 ? glm::normalize(toGoal) : glm::vec2(0);
 
     float normalizedDistance = dist / glm::length(m_Goal - emb->GetStartPosition());

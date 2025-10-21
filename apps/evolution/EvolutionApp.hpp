@@ -48,6 +48,8 @@ class EvolutionApp : public gen::IApp {
 
     bool m_IsObserving = false;
 
+    gen::Genome m_BestGenome;
+
     std::vector<std::unique_ptr<gen::Agent>> m_Agents;
     std::unique_ptr<gen::Trainer> m_Trainer;
 
@@ -55,6 +57,8 @@ class EvolutionApp : public gen::IApp {
     gen::AgentView m_AgentView;
     gen::TargetView m_StartView;
     gen::TargetView m_TargetView;
+
+    bool m_SetStartPos = false;
 
     bool m_Quit{false};
 };
