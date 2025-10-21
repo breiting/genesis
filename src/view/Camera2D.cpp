@@ -1,6 +1,5 @@
-#include <glm/gtc/matrix_transform.hpp>
-#include <genesis/model/environment/Environment.hpp>
 #include <genesis/view/Camera2D.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace gen {
 
@@ -68,21 +67,6 @@ glm::vec2 Camera2D::ScreenToWorld(const glm::vec2& screen, int width, int height
     glm::mat4 inv = glm::inverse(ViewProj());
     glm::vec4 world = inv * clipCoords;
     return glm::vec2{world.x, world.y};
-}
-
-void Camera2D::FitToEnvironment(Environment* env, float aspect) {
-    m_Zoom = 1.0;
-    float width = 10;  // TODO:
-    float height = 10 * aspect;
-    float worldAspect = width / height;
-
-    if (worldAspect > aspect) {
-        SetOrthoByWidth(width * 1.1f, aspect);  // 10% Margin
-    } else {
-        float targetHeight = height * 1.1f;
-        float targetWidth = targetHeight * aspect;
-        SetOrthoByWidth(targetWidth, aspect);
-    }
 }
 
 glm::mat4 Camera2D::ViewProj() const {

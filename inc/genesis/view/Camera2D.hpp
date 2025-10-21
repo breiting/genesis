@@ -3,8 +3,6 @@
 
 namespace gen {
 
-class Environment;
-
 /** Simple orthographic 2D camera (view-projection only). */
 class Camera2D {
    public:
@@ -12,8 +10,6 @@ class Camera2D {
     void SetOrtho(float l, float r, float b, float t);
     void SetOrthoByHeight(float height, float aspect);
     void SetOrthoByWidth(float width, float aspect);
-
-    void FitToEnvironment(Environment* env, float aspect);
 
     glm::vec2 ScreenToWorld(const glm::vec2& screenPos, int width, int height);
 

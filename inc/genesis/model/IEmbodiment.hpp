@@ -17,6 +17,9 @@ class IEmbodiment {
     virtual glm::vec2 GetVelocity() const = 0;
     virtual void SetVelocity(const glm::vec2& vel) = 0;
 
+    virtual float GetRadius() const = 0;
+    virtual void SetRadius(float radius) = 0;
+
     virtual void Update(float dt) = 0;
 };
 }  // namespace gen

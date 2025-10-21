@@ -1,14 +1,18 @@
 #include "EvolutionApp.hpp"
 
-#include <GLFW/glfw3.h>
 #include <imgui.h>
 
 #include <genesis/core/AppContext.hpp>
 #include <genesis/core/Time.hpp>
 #include <genesis/core/Window.hpp>
+#include <genesis/model/Agent.hpp>
+#include <genesis/model/MovementBehavior.hpp>
+#include <genesis/model/SimpleEmbodiment.hpp>
 #include <genesis/ui/ImGuiLayer.hpp>
 #include <iostream>
 #include <memory>
+
+#include "genesis/core/Math.hpp"
 
 using namespace gen;
 using namespace std;
@@ -17,21 +21,35 @@ std::string EvolutionApp::Name() const {
     return "EvolutionApp";
 }
 
+void EvolutionApp::CreateAgent(const glm::vec2& pos, const glm::vec2& target) {
+    auto agent = std::make_unique<Agent>("0");
+
+    auto embodiment = std::make_unique<SimpleEmbodiment>(pos);
+    agent->SetEmbodiment(std::move(embodiment));
+
+    std::vector<int> layer{4, 8, 2};
+    auto cap = std::make_unique<Capability>("movement", layer, std::make_unique<MovementBehavior>(target));
+    cap->Randomize();
+    agent->AddCapability(std::move(cap));
+    m_Agents.emplace_back(std::move(agent));
+}
+
 bool EvolutionApp::Init(gen::AppContext& ctx) {
     std::cout << "Initializing EvolutionApp..." << std::endl;
 
-    std::vector<int> layers = {4, 8, 2};
-    m_Population = std::make_unique<Population>(m_NumAgents, layers);
-    // m_Evaluator = std::make_unique<PathEvaluator>(50.f, glm::vec2(0, 0));
-    m_FitnessTracker = std::make_unique<gen::FitnessTracker>();
+    for (int i = 0; i < m_NumAgents; i++) {
+        auto pos = RandUnitVec2();
+        pos *= 10;
+        CreateAgent(pos, {0, 0});
+    }
 
-    m_Camera.SetOrthoByHeight(m_GlobalHeight, ctx.Aspect());
+    auto height = 100;
 
-    // m_View.Init();
+    m_Camera.SetOrthoByHeight(height, ctx.Aspect());
+
+    m_AgentView.Init();
 
     m_Gui = std::make_unique<ImGuiLayer>(ctx.GetWindow().GetNativeWindow());
-
-    m_Camera.SetOrthoByHeight(100, ctx.Aspect());
 
     onKeyPressed = [this](int key, int /*mods*/) {
         if (key == GLFW_KEY_ESCAPE) {
@@ -65,7 +83,7 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
     };
 
     onWindowSize = [this](int w, int h) {
-        m_Camera.FitToEnvironment(nullptr, float(w) / float(h));  //
+        m_Camera.SetOrthoByHeight(h, float(w) / float(h));  //
     };
 
     std::cout << "EvolutionApp initialized." << std::endl;
@@ -73,28 +91,10 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
 }
 
 void EvolutionApp::Update(gen::AppContext& /*ctx*/, double dt) {
-    // m_System->Step(static_cast<float>(dt) * m_Timescale);
-    m_CurrentStep++;
-
-    // if (m_CurrentStep > m_GenerationSteps) {
-    //     auto fitness = m_Evaluator->Evaluate(*m_System);
-    //     m_FitnessTracker->AddGeneration(fitness);
-    //     m_Population->SetFitness(fitness);
-    //     m_Population->Evolve();
-    //
-    //     auto& genomes = m_Population->GetGenomes();
-    //     auto& particles = m_System->GetParticles();
-    //
-    //     for (size_t i = 0; i < particles.size(); ++i) {
-    //         particles[i]->SetGenome(genomes[i].get());
-    //     }
-    //
-    //     m_System->RandomizePositions();
-    //     m_CurrentStep = 0;
-    //     m_Generation++;
-    // }
-    //
-    // m_View.SyncWithParticleSystem(m_System.get());
+    for (auto& a : m_Agents) {
+        a->Update(dt);
+    }
+    m_AgentView.UpdateInstances(m_Agents);
     m_Camera.Update(dt);
 }
 
@@ -104,26 +104,13 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
         return;
     }
 
-    // m_View.Draw(m_System.get(), m_Camera);
+    m_AgentView.Draw(m_Camera.ViewProj());
 
     m_Gui->BeginFrame();
 
     ImGui::Begin("Evolution Stats");
-    ImGui::Text("Generation: %d", m_Generation);
-    ImGui::Text("Best Fitness: %.3f", m_FitnessTracker->GetLastBest());
-    ImGui::Text("Avg Fitness: %.3f", m_FitnessTracker->GetLastAverage());
-    ImGui::Separator();
-
-    const auto& avg = m_FitnessTracker->GetAverageHistory();
-    const auto& best = m_FitnessTracker->GetBestHistory();
-    if (!avg.empty()) {
-        ImGui::PlotLines("Avg Fitness", avg.data(), (int)avg.size(), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 80));
-        ImGui::PlotLines("Best Fitness", best.data(), (int)best.size(), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 80));
-    }
-
     ImGui::Separator();
     ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
-    ImGui::SliderFloat("Max Speed", &m_MaxSpeed, 5.0f, 100.0f);
     ImGui::End();
 
     m_Gui->EndFrame();

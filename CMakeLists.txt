@@ -126,8 +126,10 @@ include_directories(${CMAKE_SOURCE_DIR}/inc)
 
 # Lib: genesis
 add_library(genesis
-	src/core/Time.cpp
 	src/core/Logger.cpp
+	src/core/Runner.cpp
+	src/core/Time.cpp
+	src/core/Window.cpp
 
 	src/model/Agent.cpp
 	src/model/Capability.cpp
@@ -137,6 +139,10 @@ add_library(genesis
 # src/model/agent/MovementBehavior.cpp
 # src/model/environment/PathEnvironment.cpp
 # src/model/evolution/Population.cpp
+
+	src/view/AgentView.cpp
+	src/view/Camera2D.cpp
+	src/view/Shader.cpp
 )
 
 
@@ -145,6 +151,9 @@ add_library(genesis
 # -------------------------
 set(SHADER_SRC_DIR "${CMAKE_SOURCE_DIR}/assets")
 set(GEN_INC_DIR    "${CMAKE_BINARY_DIR}/generated")
+
+embed_text_to_header("${SHADER_SRC_DIR}/agent.vert"  "${GEN_INC_DIR}/assets/agent_vert.h"  agent_vert_glsl)
+embed_text_to_header("${SHADER_SRC_DIR}/agent.frag"  "${GEN_INC_DIR}/assets/agent_frag.h"  agent_frag_glsl)
 
 target_link_libraries(genesis
 PUBLIC
@@ -164,6 +173,7 @@ PUBLIC
 
 # Apps
 add_executable(evolution
+			apps/evolution/EvolutionApp.cpp
 			apps/evolution/main.cpp
 	)
 target_link_libraries(evolution

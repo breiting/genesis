@@ -25,6 +25,14 @@ class SimpleEmbodiment : public IEmbodiment {
         m_Vel = vel;
     }
 
+    virtual float GetRadius() const override {
+        return m_Radius;
+    }
+
+    virtual void SetRadius(float radius) override {
+        m_Radius = radius;
+    }
+
     void Update(float dt) override {
         m_Pos += m_Vel * dt;
     }
@@ -32,6 +40,7 @@ class SimpleEmbodiment : public IEmbodiment {
    private:
     glm::vec2 m_Pos;
     glm::vec2 m_Vel{0, 0};
+    float m_Radius = 1.0f;
 };
 
 }  // namespace gen
