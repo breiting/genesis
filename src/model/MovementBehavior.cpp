@@ -25,7 +25,8 @@ void MovementBehavior::Execute(const std::string& capability, Agent& agent, floa
     auto output = cap->GetBrain().Forward(input);
 
     glm::vec2 accel(output[0], output[1]);
-    glm::vec2 vel = emb->GetVelocity() + accel * dt;
+    float accelScale = 5.0f;
+    glm::vec2 vel = emb->GetVelocity() + accel * accelScale * dt;
     float maxSpeed = 2.0f;
     if (glm::length(vel) > maxSpeed) vel = glm::normalize(vel) * maxSpeed;
 

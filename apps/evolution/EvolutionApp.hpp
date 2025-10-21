@@ -25,7 +25,7 @@ class EvolutionApp : public gen::IApp {
 
    private:
     void CreateAgent(const glm::vec2& pos, const glm::vec2& target);
-    void RepositionAgents();
+    void RepositionAgents(bool random = false);
 
    private:
     gen::Camera2D m_Camera;

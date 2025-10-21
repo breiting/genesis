@@ -111,10 +111,18 @@ void EvolutionApp::Update(gen::AppContext& /*ctx*/, double dt) {
     m_Camera.Update(dt);
 }
 
-void EvolutionApp::RepositionAgents() {
-    for (int i = 0; i < m_NumAgents; i++) {
-        m_Agents[i]->GetEmbodiment()->SetPosition(m_StartPos);
-        m_Agents[i]->GetEmbodiment()->SetVelocity(glm::vec2(0.0f));
+void EvolutionApp::RepositionAgents(bool random) {
+    if (random) {
+        for (int i = 0; i < m_NumAgents; i++) {
+            glm::vec2 offset = RandUnitVec2() * RandFloat(0.0f, 5);
+            m_Agents[i]->GetEmbodiment()->SetPosition(m_StartPos + offset);
+            m_Agents[i]->GetEmbodiment()->SetVelocity(glm::vec2(0.0f));
+        }
+    } else {
+        for (int i = 0; i < m_NumAgents; i++) {
+            m_Agents[i]->GetEmbodiment()->SetPosition(m_StartPos);
+            m_Agents[i]->GetEmbodiment()->SetVelocity(glm::vec2(0.0f));
+        }
     }
 }
 
@@ -125,7 +133,7 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
     }
 
     m_StartView.Draw(m_StartPos, 5.0f, glm::vec4(1.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
-    m_TargetView.Draw(m_TargetPos, 2.0f, glm::vec4(0.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
+    m_TargetView.Draw(m_TargetPos, 2.0f, glm::vec4(0.0, 1.0, 1.0, 1.0), m_Camera.ViewProj());
     m_AgentView.Draw(m_Camera.ViewProj());
 
     m_Gui->BeginFrame();
@@ -134,8 +142,15 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
     ImGui::Separator();
     ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
     ImGui::SliderInt("Agents", &m_NumAgents, 10, 200);
-    if (ImGui::Button("Observe")) {
-        RepositionAgents();
+    if (ImGui::Button("Apply")) {
+        auto bestDNA = m_Agents[0]->GetCapability("movement")->GetBrain().GetWeightsAndBiases();
+        for (auto& a : m_Agents) {
+            auto* cap = a->GetCapability("movement");
+            if (!cap) continue;
+            cap->GetBrain().SetWeightsAndBiases(bestDNA);
+        }
+
+        RepositionAgents(true);
         m_IsObserving = true;
     }
     if (ImGui::Button("Train")) {
@@ -148,11 +163,14 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
 
         constexpr float dt = 0.1f;  // 1/60
         constexpr int steps = 500;
-        constexpr float mutationRate = 0.5;
-        constexpr float mutationMag = 0.1;
+        constexpr float mutationRate = 0.05;
+        constexpr float mutationMag = 0.05;
         constexpr float elitism = 0.2;
-        for (int g = 0; g < 1; g++, m_GenCount++) {
-            RepositionAgents();
+        for (int g = 0; g < 5; g++, m_GenCount++) {
+            if (m_GenCount < 20)
+                RepositionAgents(false);
+            else
+                RepositionAgents(true);
             m_Trainer->RunGeneration(dt, steps, mutationRate, mutationMag, elitism);
             m_AgentView.UpdateInstances(m_Agents);
         }

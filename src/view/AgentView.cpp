@@ -53,7 +53,9 @@ void AgentView::UpdateInstances(const std::vector<std::unique_ptr<Agent>>& agent
         InstanceData d;
         d.position = agent->GetEmbodiment()->GetPosition();
         d.radius = agent->GetEmbodiment()->GetRadius();
-        d.color = glm::vec4(1.0, 0.0, 0.0, 1.0);
+        float f = agent->GetFitness();
+        glm::vec3 c = glm::mix(glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), f);
+        d.color = glm::vec4(c.r, c.g, c.b, 1.0);
         m_InstanceData.push_back(d);
     }
 
