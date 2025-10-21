@@ -9,12 +9,15 @@ float MovementEvaluator::Evaluate(Agent& agent) {
     auto* emb = agent.GetEmbodiment();
     if (!emb) return 0.0f;
 
-    const glm::vec2 startPos = emb->GetStartPosition();
-    const glm::vec2 curPos = emb->GetPosition();
+    const glm::vec2 src = emb->GetStartPosition();  // start position
+    const glm::vec2 pos = emb->GetPosition();       // current position
 
-    float startDist = glm::length(startPos - m_Target);
+    float dSrc = glm::length(src - m_Target);
+    float dPos = glm::length(pos - m_Target);
 
-    float fitness = 1 / startDist * glm::length(curPos - startPos);
+    float r = dPos / dSrc;  // normalize to [0..1]
+
+    float fitness = 1 / (1 + r);
 
     return fitness;
 
