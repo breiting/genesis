@@ -37,12 +37,6 @@ void EvolutionApp::CreateAgent(const glm::vec2& pos, const glm::vec2& target) {
 bool EvolutionApp::Init(gen::AppContext& ctx) {
     std::cout << "Initializing EvolutionApp..." << std::endl;
 
-    for (int i = 0; i < m_NumAgents; i++) {
-        auto pos = RandUnitVec2();
-        pos *= 10;
-        CreateAgent(pos, {0, 0});
-    }
-
     auto height = 100;
 
     m_Camera.SetOrthoByHeight(height, ctx.Aspect());
@@ -111,6 +105,15 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
     ImGui::Begin("Evolution Stats");
     ImGui::Separator();
     ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
+    ImGui::SliderInt("Agents", &m_NumAgents, 10, 100);
+    if (ImGui::Button("Generate")) {
+        m_Agents.clear();
+        for (int i = 0; i < m_NumAgents; i++) {
+            auto pos = RandUnitVec2();
+            pos *= 50;
+            CreateAgent(pos, {0, 0});
+        }
+    }
     ImGui::End();
 
     m_Gui->EndFrame();
