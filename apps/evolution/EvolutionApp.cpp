@@ -27,7 +27,7 @@ void EvolutionApp::CreateAgent(const glm::vec2& pos, const glm::vec2& target) {
     auto embodiment = std::make_unique<SimpleEmbodiment>(pos);
     agent->SetEmbodiment(std::move(embodiment));
 
-    std::vector<int> layer{4, 8, 2};
+    std::vector<int> layer{5, 8, 2};
     auto cap = std::make_unique<Capability>("movement", layer, std::make_unique<MovementBehavior>(target));
     cap->Randomize();
     agent->AddCapability(std::move(cap));
@@ -39,6 +39,8 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
 
     m_StartPos = glm::vec2(-50.0f, 0.0f);
     m_TargetPos = glm::vec2(0.0f, 0.0f);
+
+    m_Evaluator = std::make_unique<MovementEvaluator>(m_TargetPos);
 
     // Generate population
     for (int i = 0; i < m_NumAgents; i++) {
@@ -58,6 +60,11 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
     onKeyPressed = [this](int key, int /*mods*/) {
         if (key == GLFW_KEY_ESCAPE) {
             m_Quit = true;
+        } else if (key == GLFW_KEY_E) {
+            float fitness = m_Evaluator->Evaluate(*m_Agents[0].get());
+            printf("FITNESS %f\n", fitness);
+        } else if (key == GLFW_KEY_O) {
+            m_IsObserving = !m_IsObserving;
         }
     };
 
@@ -97,7 +104,7 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
 void EvolutionApp::Update(gen::AppContext& /*ctx*/, double dt) {
     if (m_IsObserving) {
         for (auto& a : m_Agents) {
-            a->Update(dt);
+            a->Update(dt * m_Timescale);
         }
         m_AgentView.UpdateInstances(m_Agents);
     }
@@ -141,14 +148,17 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
 
         constexpr float dt = 0.1f;  // 1/60
         constexpr int steps = 500;
-        constexpr float mutationRate = 0.1;
-        constexpr float mutationMag = 0.05;
-        constexpr float elitism = 0.1;
-        RepositionAgents();
-        m_Trainer->RunGeneration(dt, steps, mutationRate, mutationMag, elitism);
-        m_AgentView.UpdateInstances(m_Agents);
+        constexpr float mutationRate = 0.5;
+        constexpr float mutationMag = 0.1;
+        constexpr float elitism = 0.2;
+        for (int g = 0; g < 1; g++, m_GenCount++) {
+            RepositionAgents();
+            m_Trainer->RunGeneration(dt, steps, mutationRate, mutationMag, elitism);
+            m_AgentView.UpdateInstances(m_Agents);
+        }
     }
 
+    ImGui::Text("Generations:  %d", m_GenCount);
     if (m_Trainer) {
         ImGui::Text("Best Fitness: %.3f", m_Trainer->GetBestFitness());
         ImGui::Text("Avg Fitness:  %.3f", m_Trainer->GetAverageFitness());

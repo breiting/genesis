@@ -8,6 +8,7 @@
 #include <genesis/view/Camera2D.hpp>
 #include <memory>
 
+#include "genesis/model/MovementEvaluator.hpp"
 #include "genesis/view/TargetView.hpp"
 
 /**
@@ -38,6 +39,9 @@ class EvolutionApp : public gen::IApp {
 
     float m_Timescale = 1.0f;
     int m_NumAgents = 100;
+    int m_GenCount = 0;
+
+    std::unique_ptr<gen::MovementEvaluator> m_Evaluator;
 
     glm::vec2 m_StartPos;
     glm::vec2 m_TargetPos;

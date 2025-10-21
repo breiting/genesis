@@ -19,7 +19,9 @@ void MovementBehavior::Execute(const std::string& capability, Agent& agent, floa
     float dist = glm::length(toGoal);
     glm::vec2 dir = dist > 0 ? glm::normalize(toGoal) : glm::vec2(0);
 
-    std::vector<float> input = {dir.x, dir.y, emb->GetVelocity().x, emb->GetVelocity().y};
+    float normalizedDistance = dist / glm::length(m_Goal - emb->GetStartPosition());
+
+    std::vector<float> input = {dir.x, dir.y, emb->GetVelocity().x, emb->GetVelocity().y, normalizedDistance};
     auto output = cap->GetBrain().Forward(input);
 
     glm::vec2 accel(output[0], output[1]);

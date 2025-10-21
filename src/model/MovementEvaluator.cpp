@@ -9,22 +9,22 @@ float MovementEvaluator::Evaluate(Agent& agent) {
     auto* emb = agent.GetEmbodiment();
     if (!emb) return 0.0f;
 
-    const glm::vec2 src = emb->GetStartPosition();  // start position
-    const glm::vec2 pos = emb->GetPosition();       // current position
+    const glm::vec2 src = emb->GetStartPosition();
+    const glm::vec2 pos = emb->GetPosition();
 
-    float dSrc = glm::length(src - m_Target);
-    float dPos = glm::length(pos - m_Target);
+    float startDist = glm::length(src - m_Target);
+    float endDist = glm::length(pos - m_Target);
 
-    float r = dPos / dSrc;  // normalize to [0..1]
+    // wie viel näher ist der Agent gekommen?
+    float progress = glm::clamp((startDist - endDist) / startDist, 0.0f, 1.0f);
 
-    float fitness = 1 / (1 + r);
+    // Bonus, wenn nah am Ziel
+    float bonus = 0.0f;
+    if (endDist < 2.0f) bonus = 1.0f - (endDist / 2.0f);  // max +1
 
+    float fitness = glm::clamp(progress + bonus, 0.0f, 1.0f);
+    agent.SetFitness(fitness);
     return fitness;
-
-    // Higher fitness for being closer to target
-    // float fitness = 1.0f / (1.0f + dist * dist);
-    // agent.SetFitness(fitness);
-    // return fitness;
 }
 
 }  // namespace gen
