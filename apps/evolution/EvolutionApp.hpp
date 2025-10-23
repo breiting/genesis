@@ -9,28 +9,48 @@
 #include <memory>
 
 #include "genesis/model/MovementEvaluator.hpp"
+#include "genesis/view/EnvironmentView.hpp"
 #include "genesis/view/TargetView.hpp"
 
-/**
- * @brief Standalone demo app showcasing evolution
- */
-class EvolutionApp : public gen::IApp {
-   public:
-    ~EvolutionApp() = default;
-    std::string Name() const override;
+using namespace gen;
 
-    bool Init(gen::AppContext& ctx) override;
-    void Update(gen::AppContext& ctx, double dt) override;
-    void Render(gen::AppContext& ctx) override;
+/**
+ * @brief Standalone app for genesis
+ */
+class EvolutionApp : public IApp {
+   public:
+    EvolutionApp() = default;
+    ~EvolutionApp() = default;
+
+    // IApp interface
+    std::string Name() const override;
+    bool Init(AppContext& ctx) override;
+    void Update(AppContext& ctx, double dt) override;
+    void Render(AppContext& ctx) override;
 
    private:
+    void DrawControlPanel();
+    void DrawWorld();
     void CreateAgent(const glm::vec2& pos, const glm::vec2& target);
     void RepositionAgents(bool random = false);
+    void ApplyDarkStyle();
 
    private:
-    gen::Camera2D m_Camera;
+    std::vector<std::unique_ptr<Agent>> m_Agents;
+    std::unique_ptr<Trainer> m_Trainer;
+    std::unique_ptr<IGuiLayer> m_Gui;
 
-    std::unique_ptr<gen::IGuiLayer> m_Gui;
+    Camera2D m_Camera;
+
+    // Views
+    EnvironmentView m_EnvView;
+    AgentView m_AgentView;
+    TargetView m_StartView;
+    TargetView m_TargetView;
+
+    glm::vec2 m_WorldSize{100.0f, 100.0f};
+    glm::vec2 m_StartPos{-50.0f, 0.0f};
+    glm::vec2 m_TargetPos{0.0f, 0.0f};
 
     // Mouse handling
     glm::vec2 m_MousePos{0, 0};
@@ -39,24 +59,13 @@ class EvolutionApp : public gen::IApp {
 
     float m_Timescale = 1.0f;
     int m_NumAgents = 100;
-    int m_GenCount = 0;
+    int m_GenerationCount = 0;
 
-    std::unique_ptr<gen::MovementEvaluator> m_Evaluator;
-
-    glm::vec2 m_StartPos;
-    glm::vec2 m_TargetPos;
+    std::unique_ptr<MovementEvaluator> m_Evaluator;
 
     bool m_IsObserving = false;
 
-    gen::Genome m_BestGenome;
-
-    std::vector<std::unique_ptr<gen::Agent>> m_Agents;
-    std::unique_ptr<gen::Trainer> m_Trainer;
-
-    // Views
-    gen::AgentView m_AgentView;
-    gen::TargetView m_StartView;
-    gen::TargetView m_TargetView;
+    Genome m_BestGenome;
 
     bool m_SetStartPos = false;
 

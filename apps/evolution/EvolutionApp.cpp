@@ -37,8 +37,8 @@ void EvolutionApp::CreateAgent(const glm::vec2& pos, const glm::vec2& target) {
 bool EvolutionApp::Init(gen::AppContext& ctx) {
     std::cout << "Initializing EvolutionApp..." << std::endl;
 
-    m_StartPos = glm::vec2(-50.0f, 0.0f);
-    m_TargetPos = glm::vec2(0.0f, 0.0f);
+    m_Gui = std::make_unique<ImGuiLayer>(ctx.GetWindow().GetNativeWindow());
+    ApplyDarkStyle();
 
     m_Evaluator = std::make_unique<MovementEvaluator>(m_TargetPos);
 
@@ -47,15 +47,12 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
         CreateAgent(m_StartPos, m_TargetPos);
     }
 
-    auto height = 100;
+    m_Camera.SetOrthoByHeight(100, ctx.Aspect());
 
-    m_Camera.SetOrthoByHeight(height, ctx.Aspect());
-
+    m_EnvView.Init();
     m_AgentView.Init();
     m_StartView.Init();
     m_TargetView.Init();
-
-    m_Gui = std::make_unique<ImGuiLayer>(ctx.GetWindow().GetNativeWindow());
 
     onKeyPressed = [this](int key, int /*mods*/) {
         if (key == GLFW_KEY_ESCAPE) {
@@ -142,65 +139,127 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
         return;
     }
 
+    m_EnvView.Draw(m_WorldSize, m_Camera.ViewProj());
     m_StartView.Draw(m_StartPos, 2.0f, glm::vec4(1.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
     m_TargetView.Draw(m_TargetPos, 2.0f, glm::vec4(0.0, 1.0, 1.0, 1.0), m_Camera.ViewProj());
     m_AgentView.Draw(m_Camera.ViewProj());
 
     m_Gui->BeginFrame();
+    DrawControlPanel();
+    m_Gui->EndFrame();
+}
 
-    ImGui::Begin("Evolution Stats");
+void EvolutionApp::DrawControlPanel() {
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(350, (float)ImGui::GetIO().DisplaySize.y));
+
+    ImGui::Begin("Control Panel", nullptr,
+                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::TextColored(ImVec4(0.6f, 0.9f, 0.8f, 1.0f), "GENESIS EVOLUTION");
     ImGui::Separator();
-    ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
-    ImGui::SliderInt("Agents", &m_NumAgents, 10, 200);
-    if (ImGui::Button("Set Start Pos")) {
-        m_SetStartPos = true;
-    }
-    if (ImGui::Button("LOAD Genome")) {
-        m_BestGenome.LoadBinary("best.dna");
-    }
-    if (ImGui::Button("SAVE Genome")) {
-        m_BestGenome = m_Agents[0]->GetCapability("movement")->GetGenome();
-        m_BestGenome.SaveBinary("best.dna");
-    }
-    if (ImGui::Button("Apply")) {
-        for (auto& a : m_Agents) {
-            auto* cap = a->GetCapability("movement");
-            if (!cap) continue;
-            cap->SetFromGenome(m_BestGenome);
-        }
+    ImGui::Spacing();
 
-        RepositionAgents(true);
+    ImGui::Text("Simulation Parameters");
+    ImGui::SliderInt("Population", &m_NumAgents, 5, 200);
+    // ImGui::SliderFloat("Mutation Rate", &m_MutationRate, 0.0f, 0.3f, "%.3f");
+    // ImGui::SliderFloat("Mutation Mag", &m_MutationMag, 0.0f, 0.3f, "%.3f");
+    // ImGui::SliderFloat("Elitism", &m_Elitism, 0.0f, 0.5f, "%.2f");
+
+    ImGui::Spacing();
+    if (ImGui::Button("Start Training", ImVec2(160, 32))) {
+        auto eval = std::make_unique<MovementEvaluator>(m_TargetPos);
+        m_Trainer = std::make_unique<Trainer>(m_Agents, std::move(eval), "movement");
+        m_IsObserving = false;
+        m_GenerationCount = 0;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Stop", ImVec2(80, 32))) {
+        m_IsObserving = false;
+    }
+
+    if (ImGui::Button("Observe", ImVec2(120, 32))) {
         m_IsObserving = true;
     }
-    if (ImGui::Button("Train")) {
-        m_IsObserving = false;
 
-        if (!m_Trainer) {
-            auto eval = std::make_unique<MovementEvaluator>(m_TargetPos);
-            m_Trainer = std::make_unique<Trainer>(m_Agents, std::move(eval), "movement");
-        }
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Spacing();
 
-        constexpr float dt = 0.1f;  // 1/60
-        constexpr int steps = 500;
-        constexpr float mutationRate = 0.05;
-        constexpr float mutationMag = 0.05;
-        constexpr float elitism = 0.2;
-        for (int g = 0; g < 5; g++, m_GenCount++) {
-            if (m_GenCount < 20)
-                RepositionAgents(false);
-            else
-                RepositionAgents(true);
-            m_Trainer->RunGeneration(dt, steps, mutationRate, mutationMag, elitism);
-            m_AgentView.UpdateInstances(m_Agents);
-        }
-    }
-
-    ImGui::Text("Generations:  %d", m_GenCount);
     if (m_Trainer) {
+        ImGui::Text("Generation: %d", m_GenerationCount);
         ImGui::Text("Best Fitness: %.3f", m_Trainer->GetBestFitness());
-        ImGui::Text("Avg Fitness:  %.3f", m_Trainer->GetAverageFitness());
+        ImGui::Text("Average Fitness: %.3f", m_Trainer->GetAverageFitness());
+        ImGui::ProgressBar(m_Trainer->GetBestFitness(), ImVec2(200, 16));
     }
-    ImGui::End();
 
-    m_Gui->EndFrame();
+    // ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
+    // if (ImGui::Button("Set Start Pos")) {
+    //     m_SetStartPos = true;
+    // }
+    // if (ImGui::Button("LOAD Genome")) {
+    //     m_BestGenome.LoadBinary("best.dna");
+    // }
+    // if (ImGui::Button("SAVE Genome")) {
+    //     m_BestGenome = m_Agents[0]->GetCapability("movement")->GetGenome();
+    //     m_BestGenome.SaveBinary("best.dna");
+    // }
+    // if (ImGui::Button("Apply")) {
+    //     for (auto& a : m_Agents) {
+    //         auto* cap = a->GetCapability("movement");
+    //         if (!cap) continue;
+    //         cap->SetFromGenome(m_BestGenome);
+    //     }
+    //
+    //     RepositionAgents(true);
+    //     m_IsObserving = true;
+    // }
+    // if (ImGui::Button("Train")) {
+    //     m_IsObserving = false;
+    //
+    //     if (!m_Trainer) {
+    //         auto eval = std::make_unique<MovementEvaluator>(m_TargetPos);
+    //         m_Trainer = std::make_unique<Trainer>(m_Agents, std::move(eval), "movement");
+    //     }
+    //
+    //     constexpr float dt = 0.1f;  // 1/60
+    //     constexpr int steps = 500;
+    //     constexpr float mutationRate = 0.05;
+    //     constexpr float mutationMag = 0.05;
+    //     constexpr float elitism = 0.2;
+    //     for (int g = 0; g < 5; g++, m_GenCount++) {
+    //         if (m_GenCount < 20)
+    //             RepositionAgents(false);
+    //         else
+    //             RepositionAgents(true);
+    //         m_Trainer->RunGeneration(dt, steps, mutationRate, mutationMag, elitism);
+    //         m_AgentView.UpdateInstances(m_Agents);
+    //     }
+    // }
+    //
+    // ImGui::Text("Generations:  %d", m_GenCount);
+    // if (m_Trainer) {
+    //     ImGui::Text("Best Fitness: %.3f", m_Trainer->GetBestFitness());
+    //     ImGui::Text("Avg Fitness:  %.3f", m_Trainer->GetAverageFitness());
+    // }
+    ImGui::End();
+}
+
+void EvolutionApp::ApplyDarkStyle() {
+    auto& style = ImGui::GetStyle();
+    ImGui::StyleColorsDark();
+
+    style.WindowRounding = 6.0f;
+    style.FrameRounding = 4.0f;
+    style.ScrollbarRounding = 6.0f;
+
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.13f, 0.13f, 1.0f);
+    colors[ImGuiCol_Header] = ImVec4(0.22f, 0.22f, 0.22f, 1.0f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.3f, 0.3f, 0.3f, 1.0f);
+    colors[ImGuiCol_Button] = ImVec4(0.22f, 0.25f, 0.25f, 1.0f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.27f, 0.30f, 0.30f, 1.0f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.2f, 0.45f, 0.35f, 1.0f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
 }

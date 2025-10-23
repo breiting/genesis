@@ -4,6 +4,8 @@
 
 #include "assets/agent_frag.h"
 #include "assets/agent_vert.h"
+#include "assets/env_frag.h"
+#include "assets/env_vert.h"
 #include "assets/target_frag.h"
 #include "assets/target_vert.h"
 
@@ -102,6 +104,10 @@ void Shader::BuildAgent() {
 
 void Shader::BuildTarget() {
     CompileShader(target_vert_glsl, target_frag_glsl);
+}
+
+void Shader::BuildEnvironment() {
+    CompileShader(env_vert_glsl, env_frag_glsl);
 }
 
 }  // namespace gen

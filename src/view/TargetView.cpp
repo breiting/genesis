@@ -15,9 +15,9 @@ void TargetView::Draw(const glm::vec2& target, float radius, const glm::vec4& co
     m_Shader.Bind();
     m_Shader.SetMat4(Uniforms::MVP, vp);
     m_Shader.SetVec2(Uniforms::POS, target);
-    m_Shader.SetFloat(Uniforms::uRADIUS, radius);
-    m_Shader.SetFloat(Uniforms::uBLENDWIDTH, 0.05f);
-    m_Shader.SetVec4(Uniforms::uCOLOR, color);
+    m_Shader.SetFloat(Uniforms::RADIUS, radius);
+    m_Shader.SetFloat(Uniforms::BLENDWIDTH, 0.05f);
+    m_Shader.SetVec4(Uniforms::COLOR, color);
 
     glBindVertexArray(m_VAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
