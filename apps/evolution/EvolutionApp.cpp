@@ -50,8 +50,10 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
         CreateAgent(m_StartPos, m_TargetPos);
     }
 
-    UpdateWorldViewport(ctx);
-    m_Camera.SetViewportSize(glm::vec2(ctx.GetWidth(), ctx.GetHeight()));
+    // Viewports
+    m_ViewportUi = {0, 0, ImGuiPanelWidth, ctx.GetHeight()};
+    m_ViewportWorld = {ImGuiPanelWidth, 0, ctx.GetWidth() - ImGuiPanelWidth, ctx.GetHeight()};
+    m_Camera.SetViewportSize(glm::vec2(m_ViewportWorld.w, m_ViewportWorld.h));
     m_Camera.SetPosition(glm::vec2{0.0f});
     m_Camera.FitTo(m_WorldSize);
 
@@ -72,6 +74,7 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
             m_SetStartPos = !m_SetStartPos;
         } else if (key == GLFW_KEY_F) {
             m_Camera.FitTo(m_WorldSize);
+            m_Camera.SetPosition(glm::vec2{0.0f});
         }
     };
 
@@ -113,7 +116,9 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
     };
 
     onWindowSize = [this](int w, int h) {
-        m_Camera.SetViewportSize({w, h});
+        m_ViewportUi = {0, 0, ImGuiPanelWidth, h};
+        m_ViewportWorld = {ImGuiPanelWidth, 0, w - ImGuiPanelWidth, h};
+        m_Camera.SetViewportSize(glm::vec2(m_ViewportWorld.w, m_ViewportWorld.h));
         m_Camera.FitTo(m_WorldSize);
     };
 
@@ -146,20 +151,12 @@ void EvolutionApp::RepositionAgents(bool random) {
     }
 }
 
-void EvolutionApp::UpdateWorldViewport(const AppContext& ctx) {
-    m_WorldVP.x = ImGuiPanelWidth;
-    m_WorldVP.y = 0;
-    m_WorldVP.w = std::max(1, ctx.GetWidth() - ImGuiPanelWidth);
-    m_WorldVP.h = std::max(1, ctx.GetHeight());
-    m_Camera.SetViewportSize({(float)m_WorldVP.w, (float)m_WorldVP.h});
-}
-
 bool EvolutionApp::MouseInWorldVP(const glm::vec2& mouse) {
-    return mouse.x >= m_WorldVP.x && mouse.x < (m_WorldVP.x + m_WorldVP.w) && mouse.y >= m_WorldVP.y &&
-           mouse.y < (m_WorldVP.y + m_WorldVP.h);
+    return mouse.x >= m_ViewportWorld.x && mouse.x < (m_ViewportWorld.x + m_ViewportWorld.w) &&
+           mouse.y >= m_ViewportWorld.y && mouse.y < (m_ViewportWorld.y + m_ViewportWorld.h);
 }
 glm::vec2 EvolutionApp::ToLocalViewport(const glm::vec2& mouseScreen) {
-    return {mouseScreen.x - m_WorldVP.x, mouseScreen.y - m_WorldVP.y};
+    return {mouseScreen.x - m_ViewportWorld.x, mouseScreen.y - m_ViewportWorld.y};
 }
 
 void EvolutionApp::Render(gen::AppContext& ctx) {
@@ -168,10 +165,20 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
         return;
     }
 
+    // Render CANVAS / World
+    glEnable(GL_SCISSOR_TEST);
+    glViewport(m_ViewportWorld.x, m_ViewportWorld.y, m_ViewportWorld.w, m_ViewportWorld.h);
+    glScissor(m_ViewportWorld.x, m_ViewportWorld.y, m_ViewportWorld.w, m_ViewportWorld.h);
+    glDisable(GL_SCISSOR_TEST);
+
     m_CanvasView.Draw(m_WorldSize, m_Camera.ViewProj());
     m_StartView.Draw(m_StartPos, 2.0f, glm::vec4(1.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
     m_TargetView.Draw(m_TargetPos, 2.0f, glm::vec4(0.0, 1.0, 1.0, 1.0), m_Camera.ViewProj());
     m_AgentView.Draw(m_Camera.ViewProj());
+
+    // Render UI
+    glViewport(0, 0, ctx.GetWidth(), ctx.GetHeight());
+    glDisable(GL_SCISSOR_TEST);
 
     m_Gui->BeginFrame();
     DrawControlPanel();
@@ -222,6 +229,10 @@ void EvolutionApp::DrawControlPanel() {
         ImGui::Text("Average Fitness: %.3f", m_Trainer->GetAverageFitness());
         ImGui::ProgressBar(m_Trainer->GetBestFitness(), ImVec2(200, 16));
     }
+
+    ImGui::Text("Cam %s", m_Camera.GetInfo().c_str());
+    auto mp = m_Camera.ScreenToWorld(m_MousePos);
+    ImGui::Text("Cur %f %f", mp.x, mp.y);
 
     // ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);
     // if (ImGui::Button("Set Start Pos")) {

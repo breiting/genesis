@@ -40,7 +40,6 @@ class EvolutionApp : public IApp {
     void ApplyDarkStyle();
 
     // Handle ImGui panel
-    void UpdateWorldViewport(const AppContext& ctx);
     bool MouseInWorldVP(const glm::vec2& mouse);
     glm::vec2 ToLocalViewport(const glm::vec2& mouseScreen);
 
@@ -50,7 +49,8 @@ class EvolutionApp : public IApp {
     std::unique_ptr<IGuiLayer> m_Gui;
 
     Camera2D m_Camera;
-    Viewport m_WorldVP;  // world viewport (without imgui)
+    Viewport m_ViewportWorld;
+    Viewport m_ViewportUi;
 
     // Views
     CanvasView m_CanvasView;

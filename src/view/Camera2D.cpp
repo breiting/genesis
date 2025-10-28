@@ -1,6 +1,9 @@
 #include <algorithm>
 #include <genesis/view/Camera2D.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <sstream>
+
+using namespace std;
 
 namespace gen {
 
@@ -83,6 +86,13 @@ glm::mat4 Camera2D::ViewProj() const {
     glm::mat4 view(1.0f);
     view = glm::translate(view, glm::vec3(-m_Position, 0.0f));
     return proj * view;
+}
+
+std::string Camera2D::GetInfo() const {
+    ostringstream oss;
+    oss << m_Position.x << " " << m_Position.y << endl;
+    oss << m_ViewportSize.x << " " << m_ViewportSize.y;
+    return oss.str();
 }
 
 }  // namespace gen

@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/mat4x4.hpp>
+#include <string>
 
 namespace gen {
 
@@ -23,6 +24,8 @@ class Camera2D {
     void FitTo(const glm::vec2& areaSize);
 
     void Update(float dt);
+
+    std::string GetInfo() const;
 
    private:
     glm::vec2 m_Position{0.0f};
