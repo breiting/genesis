@@ -1,12 +1,10 @@
-#version 330 core
-
+#version 410 core
 layout (location = 0) in vec2 iPos;
 
 uniform mat4 uMVP;
-
-out vec2 vUV;
+out vec2 vPos;
 
 void main() {
-    vUV = iPos * 0.5 + 0.5;
+    vPos = iPos;
     gl_Position = uMVP * vec4(iPos, 0.0, 1.0);
 }

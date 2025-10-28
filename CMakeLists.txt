@@ -143,7 +143,7 @@ add_library(genesis
 # src/model/environment/PathEnvironment.cpp
 # src/model/evolution/Population.cpp
 
-	src/view/EnvironmentView.cpp
+	src/view/CanvasView.cpp
 	src/view/AgentView.cpp
 	src/view/Camera2D.cpp
 	src/view/Shader.cpp
@@ -163,8 +163,8 @@ embed_text_to_header("${SHADER_SRC_DIR}/agent.frag"  "${GEN_INC_DIR}/assets/agen
 embed_text_to_header("${SHADER_SRC_DIR}/target.vert"  "${GEN_INC_DIR}/assets/target_vert.h"  target_vert_glsl)
 embed_text_to_header("${SHADER_SRC_DIR}/target.frag"  "${GEN_INC_DIR}/assets/target_frag.h"  target_frag_glsl)
 
-embed_text_to_header("${SHADER_SRC_DIR}/env.vert"  "${GEN_INC_DIR}/assets/env_vert.h"  env_vert_glsl)
-embed_text_to_header("${SHADER_SRC_DIR}/env.frag"  "${GEN_INC_DIR}/assets/env_frag.h"  env_frag_glsl)
+embed_text_to_header("${SHADER_SRC_DIR}/canvas.vert"  "${GEN_INC_DIR}/assets/canvas_vert.h"  canvas_vert_glsl)
+embed_text_to_header("${SHADER_SRC_DIR}/canvas.frag"  "${GEN_INC_DIR}/assets/canvas_frag.h"  canvas_frag_glsl)
 
 target_link_libraries(genesis
 PUBLIC

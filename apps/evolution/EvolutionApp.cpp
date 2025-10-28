@@ -49,7 +49,7 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
 
     m_Camera.SetOrthoByHeight(100, ctx.Aspect());
 
-    m_EnvView.Init();
+    m_CanvasView.Init();
     m_AgentView.Init();
     m_StartView.Init();
     m_TargetView.Init();
@@ -139,7 +139,7 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
         return;
     }
 
-    m_EnvView.Draw(m_WorldSize, m_Camera.ViewProj());
+    m_CanvasView.Draw(m_WorldSize, m_Camera.ViewProj());
     m_StartView.Draw(m_StartPos, 2.0f, glm::vec4(1.0, 1.0, 0.0, 1.0), m_Camera.ViewProj());
     m_TargetView.Draw(m_TargetPos, 2.0f, glm::vec4(0.0, 1.0, 1.0, 1.0), m_Camera.ViewProj());
     m_AgentView.Draw(m_Camera.ViewProj());

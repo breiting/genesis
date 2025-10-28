@@ -1,4 +1,5 @@
 #include <genesis/core/Window.hpp>
+#include <iostream>
 #include <stdexcept>
 
 namespace gen {
@@ -6,8 +7,8 @@ namespace gen {
 bool Window::Create(const CreateInfo& ci) {
     if (!glfwInit()) return false;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, ci.msaa);
 
@@ -33,6 +34,10 @@ bool Window::Create(const CreateInfo& ci) {
     glViewport(0, 0, m_FramebufferWidth, m_FramebufferHeight);
 
     InitGlfwCallbacks();
+
+    std::cout << "GL Version:  " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GL Renderer: " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "GLSL:        " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     return true;
 }

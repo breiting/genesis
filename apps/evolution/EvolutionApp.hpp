@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "genesis/model/MovementEvaluator.hpp"
-#include "genesis/view/EnvironmentView.hpp"
+#include "genesis/view/CanvasView.hpp"
 #include "genesis/view/TargetView.hpp"
 
 using namespace gen;
@@ -43,13 +43,13 @@ class EvolutionApp : public IApp {
     Camera2D m_Camera;
 
     // Views
-    EnvironmentView m_EnvView;
+    CanvasView m_CanvasView;
     AgentView m_AgentView;
     TargetView m_StartView;
     TargetView m_TargetView;
 
-    glm::vec2 m_WorldSize{100.0f, 100.0f};
-    glm::vec2 m_StartPos{-50.0f, 0.0f};
+    glm::vec2 m_WorldSize{80.0f, 80.0f};
+    glm::vec2 m_StartPos{-30.0f, 0.0f};
     glm::vec2 m_TargetPos{0.0f, 0.0f};
 
     // Mouse handling
