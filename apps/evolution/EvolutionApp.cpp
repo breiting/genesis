@@ -17,6 +17,9 @@
 using namespace gen;
 using namespace std;
 
+// Panel width for ImGui
+constexpr int ImGuiPanelWidth = 350;
+
 std::string EvolutionApp::Name() const {
     return "EvolutionApp";
 }
@@ -47,8 +50,9 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
         CreateAgent(m_StartPos, m_TargetPos);
     }
 
-    m_Camera.SetOrtho(-m_WorldSize.x, m_WorldSize.x, -m_WorldSize.y, m_WorldSize.y);
+    UpdateWorldViewport(ctx);
     m_Camera.SetViewportSize(glm::vec2(ctx.GetWidth(), ctx.GetHeight()));
+    m_Camera.SetPosition(glm::vec2{0.0f});
     m_Camera.FitTo(m_WorldSize);
 
     m_CanvasView.Init();
@@ -64,16 +68,21 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
             printf("FITNESS %f\n", fitness);
         } else if (key == GLFW_KEY_O) {
             m_IsObserving = !m_IsObserving;
+        } else if (key == GLFW_KEY_S) {
+            m_SetStartPos = !m_SetStartPos;
         } else if (key == GLFW_KEY_F) {
             m_Camera.FitTo(m_WorldSize);
         }
     };
 
-    onScroll = [this](double /*xoffs*/, double yoffs) { m_Camera.ZoomAtCursor(yoffs * 0.1f, m_MousePos); };
+    onScroll = [this](double /*xoffs*/, double yoffs) {
+        if (!MouseInWorldVP(m_MousePos)) return;
+        m_Camera.ZoomAtCursor(yoffs * 0.1f, m_MousePos);  //
+    };
 
     onMouseMove = [this](double x, double y) {
         auto pos = glm::vec2(x, y);  //
-        if (m_IsDragging) {
+        if (m_IsDragging && MouseInWorldVP(pos)) {
             glm::vec2 delta = pos - m_MousePos;
             delta.y *= -1.0;
             m_Camera.Pan(delta);
@@ -84,6 +93,7 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
     onMouseButton = [this](int button, int action, int /*mod*/) {
         if (button == GLFW_MOUSE_BUTTON_1) {
             if (action == GLFW_PRESS) {
+                if (!MouseInWorldVP(m_MousePos)) return;
                 if (m_SetStartPos) {
                     m_StartPos = m_Camera.ScreenToWorld(m_MousePos);
 
@@ -136,6 +146,22 @@ void EvolutionApp::RepositionAgents(bool random) {
     }
 }
 
+void EvolutionApp::UpdateWorldViewport(const AppContext& ctx) {
+    m_WorldVP.x = ImGuiPanelWidth;
+    m_WorldVP.y = 0;
+    m_WorldVP.w = std::max(1, ctx.GetWidth() - ImGuiPanelWidth);
+    m_WorldVP.h = std::max(1, ctx.GetHeight());
+    m_Camera.SetViewportSize({(float)m_WorldVP.w, (float)m_WorldVP.h});
+}
+
+bool EvolutionApp::MouseInWorldVP(const glm::vec2& mouse) {
+    return mouse.x >= m_WorldVP.x && mouse.x < (m_WorldVP.x + m_WorldVP.w) && mouse.y >= m_WorldVP.y &&
+           mouse.y < (m_WorldVP.y + m_WorldVP.h);
+}
+glm::vec2 EvolutionApp::ToLocalViewport(const glm::vec2& mouseScreen) {
+    return {mouseScreen.x - m_WorldVP.x, mouseScreen.y - m_WorldVP.y};
+}
+
 void EvolutionApp::Render(gen::AppContext& ctx) {
     if (m_Quit) {
         ctx.RequestQuit();
@@ -154,7 +180,7 @@ void EvolutionApp::Render(gen::AppContext& ctx) {
 
 void EvolutionApp::DrawControlPanel() {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(350, (float)ImGui::GetIO().DisplaySize.y));
+    ImGui::SetNextWindowSize(ImVec2(ImGuiPanelWidth, (float)ImGui::GetIO().DisplaySize.y));
 
     ImGui::Begin("Control Panel", nullptr,
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |

@@ -14,6 +14,10 @@
 
 using namespace gen;
 
+struct Viewport {
+    int x = 0, y = 0, w = 0, h = 0;  // y = top-left origin
+};
+
 /**
  * @brief Standalone app for genesis
  */
@@ -35,12 +39,18 @@ class EvolutionApp : public IApp {
     void RepositionAgents(bool random = false);
     void ApplyDarkStyle();
 
+    // Handle ImGui panel
+    void UpdateWorldViewport(const AppContext& ctx);
+    bool MouseInWorldVP(const glm::vec2& mouse);
+    glm::vec2 ToLocalViewport(const glm::vec2& mouseScreen);
+
    private:
     std::vector<std::unique_ptr<Agent>> m_Agents;
     std::unique_ptr<Trainer> m_Trainer;
     std::unique_ptr<IGuiLayer> m_Gui;
 
     Camera2D m_Camera;
+    Viewport m_WorldVP;  // world viewport (without imgui)
 
     // Views
     CanvasView m_CanvasView;
