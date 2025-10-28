@@ -44,7 +44,7 @@ class Camera2D {
     float m_ZoomLerp = 0.2f;
     float m_MoveLerp = 0.2f;
 
-    glm::vec2 m_ViewportSize{800.0f, 600.0f};
+    glm::vec2 m_ViewportSize{1200.0f, 800.0f};
 
     //
 };

@@ -132,6 +132,22 @@ void EvolutionApp::Update(gen::AppContext& /*ctx*/, double dt) {
             a->Update(dt * m_Timescale);
         }
         m_AgentView.UpdateInstances(m_Agents);
+    } else {
+        constexpr int steps = 500;
+        constexpr float mutationRate = 0.05;
+        constexpr float mutationMag = 0.05;
+        constexpr float elitism = 0.2;
+        for (int g = 0; g < 5; g++, m_GenerationCount++) {
+            if (m_GenerationCount < 20)
+                RepositionAgents(false);
+            else
+                RepositionAgents(true);
+            if (m_Trainer) {
+                m_Trainer->RunGeneration(dt, steps, mutationRate, mutationMag, elitism);
+                m_AgentView.UpdateInstances(m_Agents);
+            }
+        }
+        m_IsObserving = true;
     }
     m_Camera.Update(dt);
 }
@@ -208,14 +224,15 @@ void EvolutionApp::DrawControlPanel() {
     // ImGui::SliderFloat("Elitism", &m_Elitism, 0.0f, 0.5f, "%.2f");
 
     ImGui::Spacing();
-    if (ImGui::Button("Start Training", ImVec2(160, 32))) {
+    ImGui::Text("Training");
+    if (ImGui::Button("Init", ImVec2(160, 32))) {
         auto eval = std::make_unique<MovementEvaluator>(m_TargetPos);
         m_Trainer = std::make_unique<Trainer>(m_Agents, std::move(eval), "movement");
         m_IsObserving = false;
         m_GenerationCount = 0;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Stop", ImVec2(80, 32))) {
+    if (ImGui::Button("Train", ImVec2(80, 32))) {
         m_IsObserving = false;
     }
 
