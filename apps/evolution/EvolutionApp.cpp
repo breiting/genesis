@@ -49,6 +49,7 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
 
     m_Camera.SetOrtho(-m_WorldSize.x, m_WorldSize.x, -m_WorldSize.y, m_WorldSize.y);
     m_Camera.SetViewportSize(glm::vec2(ctx.GetWidth(), ctx.GetHeight()));
+    m_Camera.FitTo(m_WorldSize);
 
     m_CanvasView.Init();
     m_AgentView.Init();
@@ -63,6 +64,8 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
             printf("FITNESS %f\n", fitness);
         } else if (key == GLFW_KEY_O) {
             m_IsObserving = !m_IsObserving;
+        } else if (key == GLFW_KEY_F) {
+            m_Camera.FitTo(m_WorldSize);
         }
     };
 
@@ -73,7 +76,7 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
         if (m_IsDragging) {
             glm::vec2 delta = pos - m_MousePos;
             delta.y *= -1.0;
-            m_Camera.Pan(delta * 0.2f);
+            m_Camera.Pan(delta);
         }
         m_MousePos = pos;
     };

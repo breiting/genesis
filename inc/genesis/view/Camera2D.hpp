@@ -35,7 +35,7 @@ class Camera2D {
     float m_Left, m_Right, m_Bottom, m_Top;
 
     // Settings
-    float m_MinZoom = 5.2f;
+    float m_MinZoom = 5.0f;
     float m_MaxZoom = 100.0f;
     float m_PanDamping = 0.85f;
     float m_ZoomLerp = 0.2f;
