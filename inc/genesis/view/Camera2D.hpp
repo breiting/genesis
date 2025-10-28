@@ -8,27 +8,42 @@ class Camera2D {
    public:
     Camera2D();
     void SetOrtho(float l, float r, float b, float t);
-    void SetOrthoByHeight(float height, float aspect);
-    void SetOrthoByWidth(float width, float aspect);
 
-    glm::vec2 ScreenToWorld(const glm::vec2& screenPos, int width, int height);
+    void SetViewportSize(const glm::vec2& size);
+
+    glm::vec2 ScreenToWorld(const glm::vec2& screenPos);
 
     void SetPosition(glm::vec2 pos);
     void SetZoom(float z);
+
     glm::mat4 ViewProj() const;
 
-    void ZoomAtCursor(float zoomDelta, const glm::vec2& cursorScreen, int screenWidth, int screenHeight);
+    void ZoomAtCursor(float zoomDelta, const glm::vec2& cursorScreen);
     void Pan(const glm::vec2& delta);
+    void FitTo(const glm::vec2& areaSize);
 
     void Update(float dt);
 
    private:
-    glm::vec2 m_Position;
-    float m_Left, m_Right, m_Bottom, m_Top;
-    float m_Zoom;
-    glm::vec2 m_TargetPosition;
+    glm::vec2 m_Position{0.0f};
+    glm::vec2 m_TargetPosition{0.0f};
+    glm::vec2 m_Velocity{0.0f};
+
+    float m_Zoom = 1.0f;
     float m_TargetZoom = 1.0f;
-    float m_LerpSpeed = 0.15f;  // for smooth panning/zooming
+
+    float m_Left, m_Right, m_Bottom, m_Top;
+
+    // Settings
+    float m_MinZoom = 5.2f;
+    float m_MaxZoom = 100.0f;
+    float m_PanDamping = 0.85f;
+    float m_ZoomLerp = 0.2f;
+    float m_MoveLerp = 0.2f;
+
+    glm::vec2 m_ViewportSize{800.0f, 600.0f};
+
+    //
 };
 
 }  // namespace gen

@@ -47,7 +47,8 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
         CreateAgent(m_StartPos, m_TargetPos);
     }
 
-    m_Camera.SetOrthoByHeight(100, ctx.Aspect());
+    m_Camera.SetOrtho(-m_WorldSize.x, m_WorldSize.x, -m_WorldSize.y, m_WorldSize.y);
+    m_Camera.SetViewportSize(glm::vec2(ctx.GetWidth(), ctx.GetHeight()));
 
     m_CanvasView.Init();
     m_AgentView.Init();
@@ -65,25 +66,23 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
         }
     };
 
-    onScroll = [this, &ctx](double /*xoffs*/, double yoffs) {
-        m_Camera.ZoomAtCursor(yoffs * 0.1f, m_MousePos, ctx.GetWidth(), ctx.GetHeight());
-    };
+    onScroll = [this](double /*xoffs*/, double yoffs) { m_Camera.ZoomAtCursor(yoffs * 0.1f, m_MousePos); };
 
     onMouseMove = [this](double x, double y) {
         auto pos = glm::vec2(x, y);  //
         if (m_IsDragging) {
             glm::vec2 delta = pos - m_MousePos;
             delta.y *= -1.0;
-            m_Camera.Pan(-delta * 0.2f);
+            m_Camera.Pan(delta * 0.2f);
         }
         m_MousePos = pos;
     };
 
-    onMouseButton = [this, &ctx](int button, int action, int /*mod*/) {
+    onMouseButton = [this](int button, int action, int /*mod*/) {
         if (button == GLFW_MOUSE_BUTTON_1) {
             if (action == GLFW_PRESS) {
                 if (m_SetStartPos) {
-                    m_StartPos = m_Camera.ScreenToWorld(m_MousePos, ctx.GetWidth(), ctx.GetHeight());
+                    m_StartPos = m_Camera.ScreenToWorld(m_MousePos);
 
                     m_Agents.clear();
                     for (int i = 0; i < m_NumAgents; i++) {
@@ -101,7 +100,8 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
     };
 
     onWindowSize = [this](int w, int h) {
-        m_Camera.SetOrthoByHeight(h, float(w) / float(h));  //
+        m_Camera.SetViewportSize({w, h});
+        m_Camera.FitTo(m_WorldSize);
     };
 
     std::cout << "EvolutionApp initialized." << std::endl;
