@@ -98,14 +98,14 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
             if (action == GLFW_PRESS) {
                 if (!MouseInWorldVP(m_MousePos)) return;
                 if (m_SetStartPos) {
-                    m_StartPos = m_Camera.ScreenToWorld(m_MousePos);
+                    m_StartPos = m_Camera.ScreenToWorld(GetMousePosition());
 
                     m_Agents.clear();
                     for (int i = 0; i < m_NumAgents; i++) {
                         CreateAgent(m_StartPos, m_TargetPos);
                     }
 
-                    m_SetStartPos = false;
+                    // m_SetStartPos = false;
                 }
                 m_DragStart = m_MousePos;
                 m_IsDragging = true;
@@ -157,6 +157,10 @@ bool EvolutionApp::MouseInWorldVP(const glm::vec2& mouse) {
 }
 glm::vec2 EvolutionApp::ToLocalViewport(const glm::vec2& mouseScreen) {
     return {mouseScreen.x - m_ViewportWorld.x, mouseScreen.y - m_ViewportWorld.y};
+}
+
+glm::vec2 EvolutionApp::GetMousePosition() {
+    return {m_MousePos.x - m_ViewportWorld.x, m_MousePos.y - m_ViewportWorld.y};
 }
 
 void EvolutionApp::Render(gen::AppContext& ctx) {
@@ -231,7 +235,7 @@ void EvolutionApp::DrawControlPanel() {
     }
 
     ImGui::Text("Cam %s", m_Camera.GetInfo().c_str());
-    auto mp = m_Camera.ScreenToWorld(m_MousePos);
+    auto mp = m_Camera.ScreenToWorld(GetMousePosition());
     ImGui::Text("Cur %f %f", mp.x, mp.y);
 
     // ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f);

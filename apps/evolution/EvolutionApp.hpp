@@ -42,6 +42,8 @@ class EvolutionApp : public IApp {
     // Handle ImGui panel
     bool MouseInWorldVP(const glm::vec2& mouse);
     glm::vec2 ToLocalViewport(const glm::vec2& mouseScreen);
+    // Gets the correct mouse position in proper viewport
+    glm::vec2 GetMousePosition();
 
    private:
     std::vector<std::unique_ptr<Agent>> m_Agents;
