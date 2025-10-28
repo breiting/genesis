@@ -104,23 +104,6 @@ target_include_directories(imgui PUBLIC
 
 target_link_libraries(imgui PUBLIC glfw)
 
-# GUI Layer
-add_library(genesis_ui
-		src/ui/ImGuiLayer.cpp
-)
-
-target_include_directories(genesis_ui
-PUBLIC inc
-	${imgui_SOURCE_DIR}
-	${imgui_SOURCE_DIR}/backends
-	extern
-)
-
-target_link_libraries(genesis_ui
-	PUBLIC imgui
-	PRIVATE glfw glad
-)
-
 # Common include dir
 include_directories(${CMAKE_SOURCE_DIR}/inc)
 
@@ -143,11 +126,16 @@ add_library(genesis
 # src/model/environment/PathEnvironment.cpp
 # src/model/evolution/Population.cpp
 
+	src/modules/BrownianSim.cpp
+
 	src/view/CanvasView.cpp
 	src/view/AgentView.cpp
 	src/view/Camera2D.cpp
 	src/view/Shader.cpp
 	src/view/TargetView.cpp
+
+	src/ui/ImGuiLayer.cpp
+
 )
 
 
@@ -168,6 +156,7 @@ embed_text_to_header("${SHADER_SRC_DIR}/canvas.frag"  "${GEN_INC_DIR}/assets/can
 
 target_link_libraries(genesis
 PUBLIC
+	imgui
 	project_settings
 	glfw glad glm::glm
 	TBB::tbb
@@ -179,6 +168,9 @@ target_include_directories(genesis
 PUBLIC
 	inc
 	extern/stb
+	extern
+	${imgui_SOURCE_DIR}
+	${imgui_SOURCE_DIR}/backends
 	${GEN_INC_DIR}
 )
 
@@ -188,7 +180,7 @@ add_executable(evolution
 			apps/evolution/main.cpp
 	)
 target_link_libraries(evolution
-			PRIVATE genesis glm::glm genesis_ui
+			PRIVATE genesis glm::glm
 	)
 target_include_directories(evolution
 	PRIVATE
