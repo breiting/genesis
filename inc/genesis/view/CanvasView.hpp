@@ -2,6 +2,8 @@
 #include <genesis/view/Shader.hpp>
 #include <glm/glm.hpp>
 
+#include "genesis/core/Colors.hpp"
+
 namespace gen {
 
 /**
@@ -11,7 +13,7 @@ namespace gen {
  */
 class CanvasView {
    public:
-    CanvasView();
+    CanvasView(const glm::vec4& backgroundColor = Colors::Nord0);
     ~CanvasView();
 
     void Init();
@@ -21,11 +23,9 @@ class CanvasView {
     Shader m_Shader;
     unsigned int m_Vao = 0, m_Vbo = 0;
 
-    float m_Radius = 0.25;
-    float m_ShadowSize = 5.0f;
-    glm::vec4 m_ColorInner = {0.2f, 0.8f, 0.3f, 1.0f};  //{0.17f, 0.17f, 0.18f, 1.0f};
-    // glm::vec4 m_ColorShadow = {0.07f, 0.07f, 0.07f, 1.0f};
-    glm::vec4 m_ColorShadow = {1.0, 0.0, 0.0, 1.0};
+    float m_Radius = 1.0;
+    glm::vec4 m_GlassColor = {0.75f, 0.78f, 0.82f, 1.0f};
+    glm::vec4 m_BackgroundColor;
 };
 
 }  // namespace gen

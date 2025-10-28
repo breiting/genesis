@@ -6,7 +6,7 @@
 
 using namespace gen;
 
-CanvasView::CanvasView() {
+CanvasView::CanvasView(const glm::vec4& backgroundColor) : m_BackgroundColor(backgroundColor) {
 }
 
 CanvasView::~CanvasView() {
@@ -40,18 +40,12 @@ void CanvasView::Draw(const glm::vec2& size, const glm::mat4& vp) {
     glm::mat4 mvp = vp * model;
 
     m_Shader.SetMat4(Uniforms::MVP, mvp);
-    // m_Shader.SetFloat(Uniforms::RADIUS, 10.0);
-
-    m_Shader.SetVec2("uSize", {80.0, 80.0});
-    m_Shader.SetFloat("uRadius", 1.0f);
-    m_Shader.SetVec3("uBgColor", {0.04f, 0.05f, 0.07f});
-    m_Shader.SetVec3("uGlassColor", {1.75f, 0.78f, 0.82f});
-    m_Shader.SetFloat("uAlpha", 0.3f);
-    m_Shader.SetFloat("uFrost", 0.15f);
-
-    // m_Shader.SetFloat(Uniforms::SHADOW_SIZE, m_ShadowSize);
-    // m_Shader.SetVec4(Uniforms::COLOR, m_ColorInner);
-    // m_Shader.SetVec4(Uniforms::SHADOW_COLOR, m_ColorShadow);
+    m_Shader.SetVec2(Uniforms::SIZE, size);
+    m_Shader.SetFloat(Uniforms::RADIUS, m_Radius);
+    m_Shader.SetVec3(Uniforms::GLASS_COLOR, m_GlassColor);
+    m_Shader.SetFloat(Uniforms::ALPHA, 0.2f);
+    m_Shader.SetFloat(Uniforms::FROST, 0.15f);
+    m_Shader.SetVec3(Uniforms::BACKGROUND_COLOR, m_BackgroundColor);
 
     glBindVertexArray(m_Vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

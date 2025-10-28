@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "genesis/core/Colors.hpp"
+
 namespace gen {
 
 bool Window::Create(const CreateInfo& ci) {
@@ -100,7 +102,8 @@ float Window::Aspect() const {
 }
 
 void Window::BeginFrame() {
-    glClearColor(0.02f, 0.02f, 0.03f, 1.0f);
+    auto bg = Colors::Nord0;
+    glClearColor(bg.r, bg.g, bg.b, bg.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
