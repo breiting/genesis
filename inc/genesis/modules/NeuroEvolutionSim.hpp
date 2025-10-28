@@ -1,16 +1,14 @@
 #pragma once
+#include <genesis/model/Agent.hpp>
+#include <genesis/model/MovementEvaluator.hpp>
+#include <genesis/model/Trainer.hpp>
+#include <genesis/modules/ISimModule.hpp>
+#include <genesis/view/AgentView.hpp>
+#include <genesis/view/CanvasView.hpp>
+#include <genesis/view/TargetView.hpp>
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-
-#include "genesis/core/Math.hpp"
-#include "genesis/model/Agent.hpp"
-#include "genesis/model/MovementEvaluator.hpp"
-#include "genesis/model/Trainer.hpp"
-#include "genesis/modules/ISimModule.hpp"
-#include "genesis/view/AgentView.hpp"
-#include "genesis/view/CanvasView.hpp"
-#include "genesis/view/TargetView.hpp"
 
 namespace gen {
 

@@ -1,9 +1,8 @@
 #include <imgui.h>
 
+#include <genesis/model/MovementBehavior.hpp>
+#include <genesis/model/SimpleEmbodiment.hpp>
 #include <genesis/modules/NeuroEvolutionSim.hpp>
-
-#include "genesis/model/MovementBehavior.hpp"
-#include "genesis/model/SimpleEmbodiment.hpp"
 
 namespace gen {
 

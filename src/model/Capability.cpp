@@ -1,4 +1,3 @@
-#include <cmath>
 #include <genesis/model/Capability.hpp>
 
 namespace gen {

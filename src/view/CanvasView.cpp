@@ -41,7 +41,7 @@ void CanvasView::Draw(const glm::vec2& size, const glm::mat4& vp) {
 
     m_Shader.SetMat4(Uniforms::MVP, mvp);
     m_Shader.SetVec2(Uniforms::SIZE, size);
-    m_Shader.SetFloat(Uniforms::RADIUS, m_Radius);
+    m_Shader.SetFloat(Uniforms::RADIUS, size.x / 100.0);  // m_Radius);
     m_Shader.SetVec3(Uniforms::GLASS_COLOR, m_GlassColor);
     m_Shader.SetFloat(Uniforms::ALPHA, 0.2f);
     m_Shader.SetFloat(Uniforms::FROST, 0.15f);

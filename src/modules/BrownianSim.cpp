@@ -18,9 +18,10 @@ void BrownianSim::Reset() {
     m_Particles.clear();
     m_Particles.resize(m_NumParticles);
     for (auto& p : m_Particles) {
-        auto pos = RandInCircle(m_WorldHalfSize.x);
+        auto pos = RandInCircle();
         auto particle = std::make_unique<Agent>("P");
         auto embodiment = std::make_unique<SimpleEmbodiment>(pos);
+        embodiment->SetRadius(0.05);
         particle->SetEmbodiment(std::move(embodiment));
         p = std::move(particle);
     }

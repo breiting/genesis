@@ -21,7 +21,8 @@ void main()
 {
 	vec2 p = vPos * uSize; // world - coordinates
     float dist = roundedBoxSDF(p, uSize * 0.5, uRadius);
-    float inside = smoothstep(0.0, -0.2, dist);
+	float aa = fwidth(dist);
+    float inside = smoothstep(0.0, -aa, dist);
 
     // minor noise for milk-glass effect
     float noise = fract(sin(dot(vPos, vec2(12.9898,78.233))) * 43758.5453);

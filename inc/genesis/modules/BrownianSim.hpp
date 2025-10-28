@@ -31,7 +31,7 @@ class BrownianSim : public ISimModule {
     AgentView m_View;
 
     // world bounds
-    glm::vec2 m_WorldHalfSize{50.0f, 50.0f};
+    glm::vec2 m_WorldHalfSize{5.0f, 5.0f};
 
     // simulation params
     int m_NumParticles = 500;
