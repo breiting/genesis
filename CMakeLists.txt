@@ -122,20 +122,17 @@ add_library(genesis
 	src/model/MovementEvaluator.cpp
 	src/model/NeuralNetwork.cpp
 	src/model/Trainer.cpp
-# src/model/agent/MovementBehavior.cpp
-# src/model/environment/PathEnvironment.cpp
-# src/model/evolution/Population.cpp
 
 	src/modules/BrownianSim.cpp
+	src/modules/NeuroEvolutionSim.cpp
 
-	src/view/CanvasView.cpp
 	src/view/AgentView.cpp
 	src/view/Camera2D.cpp
+	src/view/CanvasView.cpp
 	src/view/Shader.cpp
 	src/view/TargetView.cpp
 
 	src/ui/ImGuiLayer.cpp
-
 )
 
 

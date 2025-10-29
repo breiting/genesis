@@ -24,6 +24,8 @@ class Trainer {
         return m_BestFitness;
     }
 
+    const Genome& GetBestGenome() const;
+
    private:
     std::vector<std::unique_ptr<Agent>>& m_Agents;
     std::unique_ptr<IFitnessEvaluator> m_Evaluator;

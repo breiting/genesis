@@ -61,4 +61,8 @@ void Trainer::RunGeneration(float dt, size_t steps, float mutationRate, float mu
     std::cout << "Generation finished: avg=" << m_AvgFitness << " best=" << m_BestFitness << std::endl;
 }
 
+const Genome& Trainer::GetBestGenome() const {
+    return m_Agents[0]->GetCapability("movement")->GetGenome();
+}
+
 }  // namespace gen
