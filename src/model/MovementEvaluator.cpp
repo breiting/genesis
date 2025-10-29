@@ -23,6 +23,13 @@ float MovementEvaluator::Evaluate(Agent& agent) {
     if (endDist < 2.0f) bonus = 1.0f - (endDist / 2.0f);  // max +1
 
     float fitness = glm::clamp(progress + bonus, 0.0f, 1.0f);
+
+    // Max Bonus, wenn direkt dort
+    float velMag = glm::length(emb->GetVelocity());
+    if (endDist < 1.0f) {
+        fitness += 0.1f * (1.0f - glm::clamp(velMag, 0.0f, 1.0f));  // Bonus fürs Stillstehen
+    }
+
     agent.SetFitness(fitness);
     return fitness;
 }

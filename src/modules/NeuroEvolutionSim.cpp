@@ -17,10 +17,9 @@ void NeuroEvolutionSim::OnAttach() {
     m_TargetView.Init();
 
     // Evaluator (auf aktuelles Target)
-    m_Evaluator = std::make_unique<MovementEvaluator>(m_TargetPos);
-
+    // m_Evaluator = std::make_unique<MovementEvaluator>(m_TargetPos);
     // Erstpopulation
-    RebuildPopulation();
+    // RebuildPopulation();
 }
 
 void NeuroEvolutionSim::Reset() {
@@ -71,7 +70,6 @@ void NeuroEvolutionSim::RepositionAgents(bool random) {
 
 void NeuroEvolutionSim::TrainOneGeneration() {
     if (!m_Trainer) {
-        // eigener Evaluator je Generation (Target kann sich ändern)
         m_Trainer = std::make_unique<Trainer>(m_Agents, std::make_unique<MovementEvaluator>(m_TargetPos), "movement");
     }
 
@@ -90,11 +88,13 @@ void NeuroEvolutionSim::Update(double dt) {
         return;
     }
 
-    // Trainings-“Burst” (wie vorher in der App): mehrere Generationen auf Klick
+    // Trainings-“Burst”
     for (int g = 0; g < m_GenerationsPerClick; ++g) {
         TrainOneGeneration();
     }
-    // Danach automatisch in Observe schalten? Nein – bleibt im Train-Modus bis Button.
+    // After training
+    RepositionAgents(false);
+    m_IsObserving = true;
 }
 
 void NeuroEvolutionSim::RenderWorld(const glm::mat4& vp) {
@@ -169,12 +169,12 @@ void NeuroEvolutionSim::RenderImGui() {
     if (ImGui::Button("Train", ImVec2(120, 28))) {
         m_IsObserving = false;
     }
-
-    ImGui::SliderInt("Gens/Click", &m_GenerationsPerClick, 1, 100);
     ImGui::SameLine();
     if (ImGui::Button("Observe", ImVec2(120, 28))) {
         m_IsObserving = true;
     }
+
+    ImGui::SliderInt("Gens/Click", &m_GenerationsPerClick, 1, 100);
     ImGui::SliderFloat("Timescale", &m_Timescale, 0.2f, 10.0f, "%.2f");
 
     // Stats
