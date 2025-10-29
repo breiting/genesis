@@ -107,6 +107,10 @@ size_t NeuralNetwork::GetBiasCount() const {
     return total;
 }
 
+size_t NeuralNetwork::GetLayerCount() const {
+    return m_Layers.size();
+}
+
 // ============================================================
 // === Initialization
 // ============================================================

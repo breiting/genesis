@@ -11,6 +11,8 @@
 
 #include "genesis/modules/BrownianSim.hpp"
 #include "genesis/modules/NeuroEvolutionSim.hpp"
+#include "genesis/modules/RegressionSim.hpp"
+#include "genesis/modules/SwarmSim.hpp"
 
 using namespace gen;
 using namespace std;
@@ -78,8 +80,10 @@ bool EvolutionApp::Init(gen::AppContext& ctx) {
     };
 
     // Modules
-    m_Modules.emplace_back(std::make_unique<NeuroEvolutionSim>());
-    m_Modules.emplace_back(std::make_unique<BrownianSim>());
+    // m_Modules.emplace_back(std::make_unique<NeuroEvolutionSim>());
+    // m_Modules.emplace_back(std::make_unique<BrownianSim>());
+    // m_Modules.emplace_back(std::make_unique<RegressionSim>());
+    m_Modules.emplace_back(std::make_unique<SwarmSim>());
     m_CurrentModule = m_Modules.front().get();
     m_CurrentModule->OnAttach();
 

@@ -24,6 +24,10 @@ class Trainer {
         return m_BestFitness;
     }
 
+    int GetGenerationCount() const {
+        return m_GenerationCount;
+    }
+
     const Genome& GetBestGenome() const;
 
    private:
@@ -33,6 +37,7 @@ class Trainer {
 
     float m_AvgFitness{0.0f};
     float m_BestFitness{0.0f};
+    int m_GenerationCount{0};
 };
 
 }  // namespace gen

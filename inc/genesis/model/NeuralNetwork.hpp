@@ -10,7 +10,8 @@ enum class ActivationType {
     Tanh,       // For positive and negative signals (e.g. direction control), (hidden/input)
     ReLU,       // For deeper networks with fast convergence (hidden)
     LeakyReLU,  // for random initialization (hidden)
-    Softsign    // smooth transitions (e.g. motor control), (output)
+    Softsign,   // smooth transitions (e.g. motor control), (output)
+    Linear,     // Linear return
 };
 
 inline float Activate(ActivationType type, float x) {
@@ -25,6 +26,8 @@ inline float Activate(ActivationType type, float x) {
             return LeakyReLU(x);
         case ActivationType::Softsign:
             return Softsign(x);
+        case ActivationType::Linear:
+            return x;
     }
     return x;
 }
@@ -52,6 +55,7 @@ class NeuralNetwork {
 
     size_t GetWeightCount() const;
     size_t GetBiasCount() const;
+    size_t GetLayerCount() const;
 
     /// Initialization
     void Randomize(float range = 1.0f);

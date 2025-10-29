@@ -122,9 +122,12 @@ add_library(genesis
 	src/model/MovementEvaluator.cpp
 	src/model/NeuralNetwork.cpp
 	src/model/Trainer.cpp
+	src/model/RegressionEvaluator.cpp
 
 	src/modules/BrownianSim.cpp
 	src/modules/NeuroEvolutionSim.cpp
+	src/modules/RegressionSim.cpp
+	src/modules/SwarmSim.cpp
 
 	src/view/AgentView.cpp
 	src/view/Camera2D.cpp

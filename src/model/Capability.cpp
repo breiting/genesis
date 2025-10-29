@@ -24,6 +24,7 @@ void Capability::SyncToGenome(Genome& g) const {
 }
 
 void Capability::Execute(Agent& agent, float dt) {
+    if (!m_Behavior) return;
     m_Behavior->Execute(m_Name, agent, dt);
 }
 
